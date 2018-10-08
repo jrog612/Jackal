@@ -1,4 +1,5 @@
-# Jackal
+Jackal
+---------------
 
 Jackal is topping framework what help to handle troublesome tasks and maintains structural simplicity and unity when use Django and Django Rest Framework.
 
