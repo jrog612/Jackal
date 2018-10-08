@@ -1,4 +1,5 @@
-from views.generics import BaseDetailUpdateDestroyGeneric, BaseListCreateGeneric, PaginateListGeneric, SimpleGeneric
+from jackal.views.generics import BaseDetailUpdateDestroyGeneric, BaseListCreateGeneric, PaginateListGeneric, \
+    SimpleGeneric
 
 
 class DetailMixin(BaseDetailUpdateDestroyGeneric):

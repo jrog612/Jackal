@@ -1,8 +1,9 @@
 from django.db import transaction
 
-from base import JackalAPIView
-from paginator import JackalPaginator
-from shortcuts import data_stabilizing, model_update
+from jackal.base import JackalAPIView
+from jackal.paginator import JackalPaginator
+from jackal.shortcuts import model_update
+from jackal.stabilizing import data_stabilizing
 
 __all__ = [
     'BaseListCreateGeneric',

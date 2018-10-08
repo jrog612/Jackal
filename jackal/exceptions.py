@@ -1,7 +1,6 @@
 from rest_framework.response import Response
-from rest_framework.views import exception_handler
 
-from base import JackalAPIException
+from jackal.base import JackalAPIException
 
 
 class MessageException(JackalAPIException):
@@ -27,8 +26,8 @@ class NotFoundException(MessageException):
 
     @property
     def message(self):
-        filter_message = ', '.join([f'{key}={value}' for key, value in self.filters.items()])
-        return '{}에서 {} 조건에 해당하는 항목을 찾을 수 없습니다.'.format(self.model.__name__, filter_message)
+        filter_condition = ', '.join([f'{key}={value}' for key, value in self.filters.items()])
+        return 'can not find {} model about \'{}\' condition'.format(self.model.__name__, filter_condition)
 
     def response_data(self):
         return {'message': self.message, 'model': self.model.__name__}
@@ -43,23 +42,8 @@ class BadRequestException(MessageException):
 
 
 class AlreadyExistException(MessageException):
-    default_message = '이미 존재하는 데이터입니다.'
+    default_message = 'data already exists'
     status_code = 400
-
-
-class ErrorCodeException(JackalAPIException):
-    status_code = 400
-
-    def __init__(self, code, message, **kwargs):
-        self.code = code
-        self.message = message
-        self.kwargs = kwargs
-
-    def response_data(self):
-        return {
-            'message': self.message,
-            'code': self.code,
-        }
 
 
 class FieldException(JackalAPIException):
@@ -77,8 +61,7 @@ class FieldException(JackalAPIException):
         }
 
 
-def jackal_exception_handler(exc, context):
+def jackal_exception_handler(exc):
     if isinstance(exc, JackalAPIException):
         return Response(exc.response_data(), status=exc.status_code)
-    else:
-        return exception_handler(exc, context)
+    return None

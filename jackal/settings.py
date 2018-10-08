@@ -5,14 +5,12 @@ from django.conf import settings
 from django.test.signals import setting_changed
 
 DEFAULTS = {
-
+    'JACKAL_STABILIZING_STRUCTURE': [],
 }
 
 IMPORT_STRINGS = [
     'JACKAL_STABILIZING_STRUCTURE',
 ]
-
-JACKAL_EXCEPTION_HANDLER = 'jackal.exceptions.jackal_exception_handler'
 
 
 class JackalSettings:
@@ -54,8 +52,8 @@ class JackalSettings:
         for attr in self._cached_attrs:
             delattr(self, attr)
         self._cached_attrs.clear()
-        if hasattr(self, '_user_settings'):
-            delattr(self, '_user_settings')
+        if hasattr(self, '_custom_settings'):
+            delattr(self, '_custom_settings')
 
 
 def perform_import(val, setting_name):

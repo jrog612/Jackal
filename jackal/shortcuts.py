@@ -1,6 +1,6 @@
 from django.apps import apps
 
-from exceptions import FieldException
+from jackal.exceptions import FieldException
 
 none_values = [[], {}, '', 'null', None, 'undefined']
 

@@ -1,9 +1,9 @@
+from jackal.loader import structure_loader
 from jackal.shortcuts import change_None, check_required, remove_None, remove_unexpected
-from jackal.settings import jackal_settings
 
 
 def data_stabilizing(data, key):
-    param_structure = jackal_settings.structure()[key]
+    param_structure = structure_loader()[key]
 
     filtered = data
 

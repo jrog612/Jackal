@@ -3,7 +3,8 @@ from rest_framework.exceptions import APIException
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from filter import RequestQueryFilter
+from jackal.exceptions import jackal_exception_handler
+from jackal.filter import RequestQueryFilter
 
 
 class JackalAPIView(APIView):
@@ -25,6 +26,17 @@ class JackalAPIView(APIView):
         super().__init__(*args, **kwargs)
         self.permission_classes += self.default_permission_classes
         self.authentication_classes += self.default_authentication_classes
+
+    def handle_exception(self, exc):
+        """
+        high jacking exception
+        """
+        response = jackal_exception_handler(exc)
+        if response is not None:
+            response.exception = True
+            return response
+        else:
+            return super().handle_exception(exc)
 
     def make_lookup_map_filterable(self, kwargs):
         return {map_value: kwargs.get(map_key) for map_key, map_value in self.lookup_map.items()}
