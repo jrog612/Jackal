@@ -5,6 +5,7 @@ from rest_framework.views import APIView
 
 from jackal.exceptions import jackal_exception_handler
 from jackal.filter import RequestQueryFilter
+from jackal.shortcuts import valid_data
 
 
 class JackalAPIView(APIView):
@@ -21,6 +22,7 @@ class JackalAPIView(APIView):
     extra_kwargs = {}
     filter_map = {}
     user_field = ''
+    valid_key = ''
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -87,12 +89,15 @@ class JackalAPIView(APIView):
         self.queryset = queryset
         return queryset
 
+    def get_valid_data(self, request):
+        return valid_data(request.data, self.valid_key)
+
     @staticmethod
     def success(detail='success', **kwargs):
         return Response({'detail': detail, **kwargs})
 
     @staticmethod
-    def response(result, status=200, headers=None, **kwargs):
+    def response(result=None, status=200, headers=None, **kwargs):
         return Response(result, status=status, headers=headers, **kwargs)
 
     @staticmethod

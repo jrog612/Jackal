@@ -77,25 +77,3 @@ class RequestQueryFilter:
                 return key.replace(n, ''), callback
         else:
             return key, None
-
-
-class QueryFunc:
-    prefix = 'func'
-
-    @classmethod
-    def get_function_set(cls):
-        ret_dict = {}
-
-        for name, func in cls.__dict__.items():
-            if name.find('{}_'.format(cls.prefix)) == 0:
-                name = name.replace('{}_'.format(cls.prefix))
-                ret_dict[name] = func
-        return ret_dict
-
-    @staticmethod
-    def func_to_list(data):
-        return data.split(',')
-
-    @staticmethod
-    def func_to_boolean(data):
-        return data.lower() == 'true'
