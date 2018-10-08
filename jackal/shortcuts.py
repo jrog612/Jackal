@@ -1,6 +1,7 @@
 from django.apps import apps
 
-from jackal.exceptions import FieldException
+from jackal.exceptions import FieldException, StructureException
+from jackal.loader import structure_loader
 
 none_values = [[], {}, '', 'null', None, 'undefined']
 
@@ -75,3 +76,34 @@ def remove_None(data, fields=None):
             elif key in fields:
                 copied_data.pop(key)
     return copied_data
+
+
+def valid_data(data, key):
+    try:
+        valid_structure = structure_loader('VALID_STRUCTURES')[key]
+    except KeyError:
+        raise StructureException('no valid structure about {} key'.format(key))
+
+    filtered = data
+
+    # 예상하지 못한 필드들은 제외
+    expected = valid_structure.get('expected', None)
+    if expected is not None:
+        filtered = remove_unexpected(data, expected)
+
+    # 필수 값 체크
+    required = valid_structure.get('required', None)
+    if required is not None:
+        check_required(filtered, required=required)
+
+    # 공백을 허용하지 않는 값 None 처리
+    null_array = valid_structure.get('null', None)
+    if null_array is not None:
+        filtered = change_None(filtered, valid_structure['null'])
+
+    # 디폴드 값이 있어서 빈 값이나 None 을 허용하지 않는 필드 제외
+    default_array = valid_structure.get('default', None)
+    if default_array is not None:
+        filtered = remove_None(filtered, valid_structure['default'])
+
+    return filtered

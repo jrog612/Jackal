@@ -99,3 +99,18 @@ class JackalAPIException(APIException):
 
     def response_data(self):
         return {}
+
+
+class MessageException(JackalAPIException):
+    default_message = ''
+
+    def __init__(self, message=None, extra_data=None, **kwargs):
+        if message is None:
+            self.message = self.default_message
+        else:
+            self.message = message
+        self.extra_data = extra_data
+        self.kwargs = kwargs
+
+    def response_data(self):
+        return {'message': self.message, **self.kwargs}
