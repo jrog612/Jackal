@@ -5,11 +5,11 @@ from django.conf import settings
 from django.test.signals import setting_changed
 
 DEFAULTS = {
-    'STABILIZING_STRUCTURES': [],
+    'VALID_STRUCTURES': [],
 }
 
 IMPORT_STRINGS = [
-    'STABILIZING_STRUCTURES',
+    'VALID_STRUCTURES',
 ]
 
 

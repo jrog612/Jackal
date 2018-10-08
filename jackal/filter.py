@@ -1,5 +1,7 @@
 from django.db.models import Q
 
+from jackal.loader import query_function_loader
+
 
 class RequestQueryFilter:
     def __init__(self, queryset, query_param, filter_map, search_type=None):
@@ -70,25 +72,30 @@ class RequestQueryFilter:
         return q_object
 
     def get_key_function(self, key):
-        for func_set_key, callback in QueryFunc.func_set().items():
-            if key.find(func_set_key) >= 0:
-                return key.replace(func_set_key, ''), callback
+        for n, callback in query_function_loader().items():
+            if key.find(n) >= 0:
+                return key.replace(n, ''), callback
         else:
             return key, None
 
 
 class QueryFunc:
-    @staticmethod
-    def func_set():
-        return {
-            '__to_list'   : QueryFunc.to_list,
-            '__to_boolean': QueryFunc.to_boolean,
-        }
+    prefix = 'func'
+
+    @classmethod
+    def get_function_set(cls):
+        ret_dict = {}
+
+        for name, func in cls.__dict__.items():
+            if name.find('{}_'.format(cls.prefix)) == 0:
+                name = name.replace('{}_'.format(cls.prefix))
+                ret_dict[name] = func
+        return ret_dict
 
     @staticmethod
-    def to_list(data):
+    def func_to_list(data):
         return data.split(',')
 
     @staticmethod
-    def to_boolean(data):
+    def func_to_boolean(data):
         return data.lower() == 'true'

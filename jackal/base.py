@@ -27,6 +27,24 @@ class JackalAPIView(APIView):
         self.permission_classes += self.default_permission_classes
         self.authentication_classes += self.default_authentication_classes
 
+    def dispatch(self, request, *args, **kwargs):
+        self.pre_dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+        self.post_dispatch(request, response, *args, **kwargs)
+        return response
+
+    def pre_dispatch(self, request, *args, **kwargs):
+        """
+        This will call before dispatch. before permission check, before authenticate, before initial request...
+        """
+        pass
+
+    def post_dispatch(self, request, response, *args, **kwargs):
+        """
+        This will call after dispatch. after all api view logic. So it receive response to argument.
+        """
+        pass
+
     def handle_exception(self, exc):
         """
         high jacking exception
