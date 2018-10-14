@@ -2,7 +2,7 @@ from django.db import transaction
 
 from jackal.base import JackalAPIView
 from jackal.paginator import SerializerPaginator
-from jackal.shortcuts import model_update
+from jackal.shortcuts import model_update, status_setter
 
 __all__ = [
     'BaseListCreateGeneric',
@@ -110,43 +110,3 @@ class SimpleGeneric(JackalAPIView):
 
     def delete_func(self, request, **kwargs):
         pass
-
-
-# class StatusChangeGeneric(JackalAPIView):
-#     """
-#     상태값 변경에 있어 자동으로 유효성 검사 및 변경을 진행해주는 제네릭입니다.
-#     status_setter 를 이용하여 상태를 변경하며, 구조체 STATUS_CONDITION 에 정의된 조건에 따라 검사를 진행합니다.
-#     검사 중 실패할 경우 403 에러와 함께 사용자에게 바로 보여줘도 되는 메세지를 제공합니다.
-#
-#     요청은 POST 를 이용합니다.
-#
-#     사용법:
-#         * model (필수)
-#         * lookup_map (필수)
-#         * status (필수) : 변경할 상태값
-#         * key (필수) : STATUS_CONDITION 구조체 및 STATUS_MAPPER 구조체 등에서 공통적으로 사용하는 key 입니다. {모델 소문자_필드명 소문자} 형태로 지정하면 됩니다.
-#         * status_field : 변경할 상태필드 명입니다. 기본 값은 `status` 입니다.
-#         * status_setter : 직접 지정할 상태 변경자. 없다면 기본 `status_setter`를 이용함.
-#
-#     """
-#
-#     status = None
-#     key = None
-#     status_field = 'status'
-#     status_setter = None
-#
-#     def change(self, request, **kwargs):
-#         obj = self.get_object(request, **kwargs)
-#         # 현재 상태 값을 가져온다.
-#         current_status = getattr(obj, self.status_field)
-#         with transaction.atomic():
-#             # 지정된 스테이터스 세터가 있다면, 그 status_setter 를 이용해 상태를 설정한다.
-#             if self.status_setter is not None:
-#                 result = self.status_setter(obj, self.status)
-#             else:
-#                 # 그게 아니라면, 기본 status_setter 를 이용한다.
-#                 result = status_setter(obj, self.status, self.key, status_field=self.status_field)
-#             # 결과 값이 False, None 등이라면 아래의 예외를 raise
-#             if not result:
-#                 raise StatusChangeException(self.key, current_status, self.status)
-#         return self.success()

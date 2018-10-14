@@ -10,7 +10,7 @@ def structure_loader(key='VALID_STRUCTURE'):
     return ret_data
 
 
-def query_function_loader(ret_data):
+def query_function_loader():
     ret_data = dict()
     for cls in jackal_settings.QUERY_FUNCTION_CLASSES:
         if isinstance(cls, QueryFunction):
