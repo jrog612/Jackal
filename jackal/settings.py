@@ -6,10 +6,14 @@ from django.test.signals import setting_changed
 
 DEFAULTS = {
     'VALID_STRUCTURES': [],
+    'STATUS_CONDITION_STRUCTURES': [],
+    'STATUS_READABLE_STRUCTURES': []
 }
 
 IMPORT_STRINGS = [
     'VALID_STRUCTURES',
+    'STATUS_CONDITION_STRUCTURES',
+    'STATUS_READABLE_STRUCTURES',
 ]
 
 

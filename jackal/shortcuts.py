@@ -107,3 +107,56 @@ def valid_data(data, key):
         filtered = remove_None(filtered, valid_structure['default'])
 
     return filtered
+
+
+def status_setter(obj, status, key, commit=True, status_field='status'):
+    if not status_checker(status, obj.status, key):
+        return False
+
+    setattr(obj, status_field, status)
+
+    if commit:
+        obj.save()
+    return True
+
+
+def operating(a, oper, b):
+    if oper == '==':
+        return a == b
+    elif oper == '<=':
+        return a <= b
+    elif oper == '<':
+        return a < b
+    elif oper == '>=':
+        return a >= b
+    elif oper == '>':
+        return a > b
+    elif oper == '!=':
+        return a != b
+    else:
+        return False
+
+
+def status_checker(status, current_status, key):
+    stru = structure_loader('STATUS_CONDITION_STRUCTURES').get(key)
+    if stru is None:
+        return False
+
+    condition = stru.get(status)
+
+    if condition is None:
+        return False
+
+    for operator, target_status in condition:
+        if not operating(current_status, operator, target_status):
+            return False
+
+    return True
+
+
+def get_readable_status(key, status):
+    stru = structure_loader('STATUS_READABLE_STRUCTURES').get(key)
+    if stru is None:
+        return '알 수 없음'
+
+    return stru.get(status, '알 수 없음')
