@@ -4,7 +4,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jackal.exceptions import jackal_exception_handler
-from jackal.filter import RequestQueryFilter
+from jackal.filter import JackalRequestFilter
 from jackal.shortcuts import valid_data
 
 
@@ -23,6 +23,8 @@ class JackalAPIView(APIView):
     filter_map = {}
     user_field = ''
     valid_key = ''
+    search_type = ''
+    request_filter = JackalRequestFilter
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -58,6 +60,9 @@ class JackalAPIView(APIView):
         else:
             return super().handle_exception(exc)
 
+    def get_request_filter_class(self):
+        return self.request_filter
+
     def make_lookup_map_filterable(self, kwargs):
         return {map_value: kwargs.get(map_key) for map_key, map_value in self.lookup_map.items()}
 
@@ -84,7 +89,8 @@ class JackalAPIView(APIView):
         queryset = queryset.filter(**query_dict)
 
         # 2차 filter_map 필터링
-        queryset = RequestQueryFilter(queryset, request.query_params, self.filter_map).data
+        request_filter_class = self.get_request_filter_class()
+        queryset = request_filter_class(queryset, request.query_params, self.filter_map).data
 
         self.queryset = queryset
         return queryset

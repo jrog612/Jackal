@@ -3,18 +3,21 @@ from django.db.models import Q
 from jackal.loader import query_function_loader
 
 
-class RequestQueryFilter:
-    def __init__(self, queryset, query_param, filter_map, search_type=None):
+class BaseRequestFilter:
+    ordering_key = ''
+    search_type_key = ''
+    search_keyword_key = ''
+
+    def __init__(self, queryset, query_params, filter_map):
         self.queryset = queryset
-        self.query_param = query_param
+        self.query_params = query_params
         self.filter_map = filter_map
-        self.search_type = search_type
 
     @property
     def data(self):
         self.queryset = self.filtering_with_filter_map()
 
-        if self.query_param.get('ordering'):
+        if self.query_params.get(self.ordering_key):
             self.queryset = self.ordering()
 
         return self.queryset
@@ -25,25 +28,25 @@ class RequestQueryFilter:
         q_objects = list()
 
         # search_type 과 그에 해당하는 타입 실제 값을 가져온다.
-        search_type_value = self.query_param.get('search_type', None)
-
+        search_type_value = self.query_params.get(self.search_type_key)
+        search_type_dict = self.filter_map.get(self.search_type_key)
         queryset = self.queryset
 
         for map_key, filter_keyword in self.filter_map.items():
             # filter_map 내에 있는 key 즉, map_key 의 이름에서 __to_boolean 과 같은 확장 함수가 사용됐는지 체크한다.
             map_key, callback = self.get_key_function(map_key)
             # 필터링을 위해 map_key 에 매칭되는 값을 get 파라미터 내에서 가져온다.
-            key = self.query_param.get(map_key)
+            key = self.query_params.get(map_key)
 
             # map_key 가 search_keyword 고 type_dict 가 None 이 아니고, value 도 존재한다면.
-            if map_key == 'search_keyword' and self.search_type is not None and search_type_value:
+            if map_key == self.search_type_key and search_type_dict and search_type_value:
                 # filter_keyword 를 type_dict 내에 있는 값으로 변환시켜버린다.
-                type_val = self.search_type.get(search_type_value)
+                type_val = search_type_dict.get(search_type_value)
                 if type_val is not None:
                     filter_keyword = type_val
 
             # 값이 비어있거나, 없으면 건너뛰기
-            if key in [None, ''] or map_key == 'search_type':
+            if key in [None, ''] or map_key == self.search_type_key:
                 continue
 
             # __function 형태의 map_key 인지 체크하여 callback 함수를 가져옴.
@@ -61,7 +64,7 @@ class RequestQueryFilter:
         return queryset.filter(*q_objects, **filterable).distinct()
 
     def ordering(self):
-        order_by = self.query_param.get('ordering').split(',')
+        order_by = self.query_params.get(self.ordering_key).split(',')
 
         return self.queryset.order_by(*order_by)
 
@@ -77,3 +80,9 @@ class RequestQueryFilter:
                 return key.replace(n, ''), callback
         else:
             return key, None
+
+
+class JackalRequestFilter(BaseRequestFilter):
+    ordering_key = 'ordering'
+    search_keyword_key = 'search_keyword'
+    search_type_key = 'search_type'

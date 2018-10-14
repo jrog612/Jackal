@@ -9,7 +9,7 @@ __all__ = [
     'BaseDetailUpdateDestroyGeneric',
     'PaginateListGeneric',
     'SimpleGeneric',
-    'StatusChangeGeneric',
+    # 'StatusChangeGeneric',
 ]
 
 
