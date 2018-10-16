@@ -5,16 +5,18 @@ from django.conf import settings
 from django.test.signals import setting_changed
 
 DEFAULTS = {
-    'VALID_STRUCTURES': [],
-    'STATUS_CONDITION_STRUCTURES': [],
-    'STATUS_READABLE_STRUCTURES': [],
-    'QUERY_FUNCTION_CLASSES': [],
+    'VALID_STRUCTURE_CLASSES': [],
+    'STATUS_CONDITION_CLASSES': [],
+    'STATUS_READABLE_CLASSES': [],
+    'QUERY_FUNCTION_CLASSES': [
+        'jackal.structure.DefaultQueryFunction',
+    ],
 }
 
 IMPORT_STRINGS = [
-    'VALID_STRUCTURES',
-    'STATUS_CONDITION_STRUCTURES',
-    'STATUS_READABLE_STRUCTURES',
+    'VALID_STRUCTURE_CLASSES',
+    'STATUS_CONDITION_CLASSES',
+    'STATUS_READABLE_CLASSES',
     'QUERY_FUNCTION_CLASSES',
 ]
 

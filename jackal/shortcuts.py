@@ -1,6 +1,6 @@
 from django.apps import apps
 
-from jackal.exceptions import FieldException, StructureException
+from jackal.exceptions import FieldException, NotFoundException, StructureException
 from jackal.loader import structure_loader
 
 none_values = [[], {}, '', 'null', None, 'undefined']
@@ -9,6 +9,13 @@ none_values = [[], {}, '', 'null', None, 'undefined']
 def get_object_or_None(model, **fields):
     items = model.objects.filter(**fields)
     return items.first() if items.exists() else None
+
+
+def get_object_or_404(model, **fields):
+    obj = get_object_or_None(model, **fields)
+    if obj is None:
+        raise NotFoundException(model, fields)
+    return obj
 
 
 def model_update(instance, **fields):
@@ -80,7 +87,7 @@ def remove_None(data, fields=None):
 
 def valid_data(data, key):
     try:
-        valid_structure = structure_loader('VALID_STRUCTURES')[key]
+        valid_structure = structure_loader('VALID_STRUCTURE_CLASSES')[key]
     except KeyError:
         raise StructureException('no valid structure about {} key'.format(key))
 
@@ -137,25 +144,25 @@ def operating(a, oper, b):
         return False
 
 
-def status_checker(status, current_status, key):
-    stru = structure_loader('STATUS_CONDITION_STRUCTURES').get(key)
+def status_checker(change_to, current, key):
+    stru = structure_loader('STATUS_CONDITION_CLASSES').get(key)
     if stru is None:
         return False
 
-    condition = stru.get(status)
+    condition = stru.get(change_to)
 
     if condition is None:
         return False
 
     for operator, target_status in condition:
-        if not operating(current_status, operator, target_status):
+        if not operating(current, operator, target_status):
             return False
 
     return True
 
 
-def get_readable_status(key, status):
-    stru = structure_loader('STATUS_READABLE_STRUCTURES').get(key)
+def readable_status(key, status):
+    stru = structure_loader('STATUS_READABLE_CLASSES').get(key)
     if stru is None:
         return '알 수 없음'
 

@@ -1,5 +1,5 @@
 from jackal.settings import jackal_settings
-from jackal.structure import JackalBaseStructure, QueryFunction
+from jackal.structure import JackalBaseStructure, BaseQueryFunction
 
 
 def structure_loader(key='VALID_STRUCTURE'):
@@ -13,6 +13,6 @@ def structure_loader(key='VALID_STRUCTURE'):
 def query_function_loader():
     ret_data = dict()
     for cls in jackal_settings.QUERY_FUNCTION_CLASSES:
-        if isinstance(cls, QueryFunction):
+        if isinstance(cls, BaseQueryFunction):
             ret_data.update(cls.get_function_set())
     return ret_data

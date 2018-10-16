@@ -1,29 +1,25 @@
-from django.db import transaction
-
-from jackal.base import JackalAPIView
-from jackal.paginator import SerializerPaginator
-from jackal.shortcuts import model_update, status_setter
+from jackal.api_view import JackalAPIView
+from jackal.paginator import JackalPaginator
+from jackal.shortcuts import model_update
 
 __all__ = [
     'BaseListCreateGeneric',
     'BaseDetailUpdateDestroyGeneric',
     'PaginateListGeneric',
     'SimpleGeneric',
-    # 'StatusChangeGeneric',
 ]
 
 
 class BaseListCreateGeneric(JackalAPIView):
-    queryset = None
     serializer_class = None
-    lookup_map = {}
-    filter_map = {}
     list_mixin = None
     create_mixin = None
 
     def list(self, request, **kwargs):
         if self.list_mixin is None:
-            ser = self.serializer_class(instance=self.get_queryset(request, **kwargs), many=True)
+            serializer_class = self.get_serializer_class()
+            filtered_queryset = self.get_filtered_queryset(request, **kwargs)
+            ser = serializer_class(instance=filtered_queryset, many=True)
             return self.response(ser.data)
         else:
             return self.response(self.list_mixin(request, **kwargs))
@@ -31,7 +27,7 @@ class BaseListCreateGeneric(JackalAPIView):
     def create(self, request, **kwargs):
         if self.create_mixin is None:
             data = self.get_valid_data(request)
-            obj = self.model.objects.create(**data)
+            obj = self.get_model().objects.create(**data)
             return self.success(id=obj.id)
 
         else:
@@ -83,16 +79,13 @@ class PaginateListGeneric(JackalAPIView):
     default_limit = 10
 
     def paginated_list(self, request, **kwargs):
-        queryset = self.get_queryset(request, **kwargs)
+        queryset = self.get_filtered_queryset(request, **kwargs)
         return self.paginated_data(request, queryset)
 
     def paginated_data(self, request, queryset):
-        page = request.query_params.get('page_number', self.default_page)
-        if int(page) <= 0:
-            page = 1
-        limit = request.query_params.get('page_length', self.default_limit)
-        paginator = SerializerPaginator(queryset, self.serializer_class, page, limit)
-        return self.response(paginator.response_data)
+        paginator = JackalPaginator(queryset, request, self.default_page, self.default_limit)
+        response_data = paginator.serialized_data(self.get_serializer_class(), self.get_serializer_context())
+        return self.response(response_data)
 
 
 class SimpleGeneric(JackalAPIView):
