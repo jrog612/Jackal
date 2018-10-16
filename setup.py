@@ -31,7 +31,7 @@ setup(
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'django', 'djangorestframework',
+        'django', 'djangorestframework', 'python-dateutil',
     ],
     python_requires='>=3.6'
 )
