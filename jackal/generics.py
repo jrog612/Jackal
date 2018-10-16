@@ -20,9 +20,9 @@ class BaseListCreateGeneric(JackalAPIView):
             serializer_class = self.get_serializer_class()
             filtered_queryset = self.get_filtered_queryset(request, **kwargs)
             ser = serializer_class(instance=filtered_queryset, many=True)
-            return self.response(ser.data)
+            return self.simple_response(ser.data)
         else:
-            return self.response(self.list_mixin(request, **kwargs))
+            return self.simple_response(self.list_mixin(request, **kwargs))
 
     def create(self, request, **kwargs):
         if self.create_mixin is None:
@@ -36,7 +36,7 @@ class BaseListCreateGeneric(JackalAPIView):
             if result is True or not result:
                 return self.success()
             else:
-                return self.response(result)
+                return self.simple_response(result)
 
 
 class BaseDetailUpdateDestroyGeneric(JackalAPIView):
@@ -48,10 +48,10 @@ class BaseDetailUpdateDestroyGeneric(JackalAPIView):
         obj = self.get_object(request, **kwargs)
         if self.detail_mixin is None:
             ser = self.serializer_class(obj)
-            return self.response(ser.data)
+            return self.simple_response(ser.data)
         else:
             data = self.detail_mixin(obj)
-            return self.response(data)
+            return self.simple_response(data)
 
     def update(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
@@ -62,7 +62,7 @@ class BaseDetailUpdateDestroyGeneric(JackalAPIView):
 
         else:
             result = self.update_mixin(request, obj)
-            return self.response(result)
+            return self.simple_response(result)
 
     def destroy(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
@@ -71,7 +71,7 @@ class BaseDetailUpdateDestroyGeneric(JackalAPIView):
             return self.success()
         else:
             result = self.destroy_mixin(request, obj)
-            return self.response(result)
+            return self.simple_response(result)
 
 
 class PaginateListGeneric(JackalAPIView):
@@ -85,7 +85,7 @@ class PaginateListGeneric(JackalAPIView):
     def paginated_data(self, request, queryset):
         paginator = JackalPaginator(queryset, request, self.default_page, self.default_limit)
         response_data = paginator.serialized_data(self.get_serializer_class(), self.get_serializer_context())
-        return self.response(response_data)
+        return self.simple_response(response_data)
 
 
 class SimpleGeneric(JackalAPIView):

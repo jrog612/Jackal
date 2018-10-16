@@ -7,7 +7,7 @@ from jackal.helpers.dict_helper import JackalDictMapper
 from jackal.shortcuts import valid_data
 
 
-class GetterMixin:
+class _GetterMixin:
     def get_queryset(self):
         return self.queryset
 
@@ -44,13 +44,13 @@ class GetterMixin:
         return {}
 
 
-class ResponseMixin:
+class _ResponseMixin:
     @staticmethod
     def success(detail='success', **kwargs):
         return Response({'detail': detail, **kwargs})
 
     @staticmethod
-    def response(result=None, status=200, headers=None, **kwargs):
+    def simple_response(result=None, status=200, headers=None, **kwargs):
         return Response(result, status=status, headers=headers, **kwargs)
 
     @staticmethod
@@ -66,7 +66,7 @@ class ResponseMixin:
         return Response(data, status=500)
 
 
-class JackalAPIView(APIView, ResponseMixin, GetterMixin):
+class JackalAPIView(APIView, _ResponseMixin, _GetterMixin):
     default_permission_classes = ()
     default_authentication_classes = ()
 
