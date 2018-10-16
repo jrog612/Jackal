@@ -80,7 +80,7 @@ class StructureException(MessageException):
     status_code = 500
 
 
-def jackal_exception_handler(exc):
+def jackal_exception_handler(exc, context):
     if isinstance(exc, JackalAPIException):
         return Response(exc.response_data(), status=exc.status_code)
     return None

@@ -7,6 +7,8 @@ def structure_loader(key='VALID_STRUCTURE'):
     for cls in getattr(jackal_settings, key):
         if isinstance(cls, JackalBaseStructure):
             ret_data.update(cls.get_structure())
+        else:
+            continue
     return ret_data
 
 

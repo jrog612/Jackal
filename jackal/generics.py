@@ -29,11 +29,9 @@ class BaseListCreateGeneric(JackalAPIView):
             data = self.get_valid_data(request)
             obj = self.get_model().objects.create(**data)
             return self.success(id=obj.id)
-
         else:
             result = self.create_mixin(request, **kwargs)
-
-            if result is True or not result:
+            if result is True or result is None:
                 return self.success()
             else:
                 return self.simple_response(result)

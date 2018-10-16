@@ -1,9 +1,9 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from jackal.exceptions import jackal_exception_handler
 from jackal.filter import JackalRequestFilter
 from jackal.helpers.dict_helper import JackalDictMapper
+from jackal.settings import jackal_settings
 from jackal.shortcuts import valid_data
 
 
@@ -42,6 +42,9 @@ class _GetterMixin:
 
     def get_serializer_context(self):
         return {}
+
+    def get_jackal_exception_handler(self):
+        return jackal_settings.EXCEPTION_HANDLER
 
 
 class _ResponseMixin:
@@ -113,7 +116,9 @@ class JackalAPIView(APIView, _ResponseMixin, _GetterMixin):
         """
         high jacking exception and handle with jackal_exception_handler
         """
-        response = jackal_exception_handler(exc)
+        jackal_handler = self.get_jackal_exception_handler()
+        context = self.get_exception_handler_context()
+        response = jackal_handler(exc, context)
         if response is not None:
             response.exception = True
             return response
