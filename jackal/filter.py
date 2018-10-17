@@ -22,6 +22,7 @@ class RequestFilterMixin:
 
 
 class JackalQueryFilter(RequestFilterMixin):
+
     ordering_key = 'ordering'
     search_keyword_key = 'search_keyword'
     search_type_key = 'search_type'
@@ -33,6 +34,19 @@ class JackalQueryFilter(RequestFilterMixin):
         self.params = params
 
     def filter_map(self, filter_map):
+        """
+        params = {
+            'name': 'Yongjin',
+            'age_lowest': '20',
+        }
+        f = JackalQueryFilter(User.objects.all(), params)
+
+        queryset = f.filter_map({
+            'name': 'name__contains',
+            'age_lowest': 'age__gte'
+        }).queryset
+        """
+
         queryset = self.queryset
 
         filterable = {}
@@ -55,6 +69,8 @@ class JackalQueryFilter(RequestFilterMixin):
         return self
 
     def search(self, search_dict):
+        """
+        """
         queryset = self.queryset
 
         keyword = self.params.get(self.search_keyword_key)
@@ -68,11 +84,15 @@ class JackalQueryFilter(RequestFilterMixin):
         return self
 
     def extra(self, **extra_kwargs):
+        """
+        """
         queryset = self.queryset
         self.queryset = queryset.filter(**extra_kwargs)
         return self
 
     def ordering(self):
+        """
+        """
         ordering = self.params.get(self.ordering_key)
         if ordering:
             queryset = self.queryset
@@ -80,7 +100,9 @@ class JackalQueryFilter(RequestFilterMixin):
             self.queryset = queryset.order_by(*order_by)
         return self
 
-    def get_obj(self, raise_404=False, **kwargs):
+    def get(self, raise_404=False, **kwargs):
+        """
+        """
         queryset = self.queryset
         obj = self.queryset.filter(**kwargs).first()
         if obj is None and raise_404:

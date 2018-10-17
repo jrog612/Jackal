@@ -132,7 +132,7 @@ class JackalAPIView(APIView, _ResponseMixin, _GetterMixin):
         lookup_map = self.get_lookup_map()
         extra_kwargs = self.get_extra_kwargs(**JackalDictMapper.av2bv(lookup_map, kwargs))
 
-        obj = f.extra(**extra_kwargs).get_obj(raise_404=True)
+        obj = f.extra(**extra_kwargs).get(raise_404=True)
         self.check_object_permissions(request=request, obj=obj)
         return obj
 

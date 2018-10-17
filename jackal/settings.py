@@ -11,7 +11,7 @@ DEFAULTS = {
     'QUERY_FUNCTION_CLASSES': [
         'jackal.structure.DefaultQueryFunction',
     ],
-    'EXCEPTION_HANDLER': 'jackal.exceptions.jackal_exception_handler'
+    'EXCEPTION_HANDLER': 'jackal.exceptions.jackal_exception_handler',
 }
 
 IMPORT_STRINGS = [
