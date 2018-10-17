@@ -39,7 +39,7 @@ class NotFoundException(MessageException):
 
     @property
     def message(self):
-        filter_condition = ', '.join([f'{key}={value}' for key, value in self.filters.items()])
+        filter_condition = ', '.join(['{}={}'.format(key, value) for key, value in self.filters.items()])
         return 'can not find {} model about \'{}\' condition'.format(self.model.__name__, filter_condition)
 
     def response_data(self):

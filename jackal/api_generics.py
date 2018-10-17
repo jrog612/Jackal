@@ -90,7 +90,7 @@ class PaginateListGeneric(JackalAPIView):
 
 class SimpleGeneric(JackalAPIView):
     def wrapper(self, request, method='get', **kwargs):
-        return getattr(self, f'{method}_func')(request, **kwargs)
+        return getattr(self, '{}_func'.format(method))(request, **kwargs)
 
     def get_func(self, request, **kwargs):
         pass

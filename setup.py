@@ -27,11 +27,13 @@ setup(
     zip_safe=False,
     classifiers=[
         "Programming Language :: Python :: 3.7",
+        "Programming Language :: Python :: 3.6",
+        "Programming Language :: Python :: 3.5",
         "License :: OSI Approved :: MIT License",
         "Operating System :: OS Independent",
     ],
     install_requires=[
-        'django', 'djangorestframework', 'python-dateutil',
+        'django>=2.0', 'djangorestframework', 'python-dateutil',
     ],
-    python_requires='>=3.6'
+    python_requires='>=3.5'
 )
