@@ -174,7 +174,28 @@ class BaseQueryFunction:
 
     해당 클래스를 상속받고, JACKAL_SETTINGS 내의 QUERY_FUNCTION_CLASSES 에 정의한 클래스의 경로를 추가하는 것으로 등록이 완료됩니다.
 
-    등록한 쿼리 함수들은
+    등록한 쿼리 함수들은 filter_map 내에서 사용 가능하게 됩니다.
+
+    ex)
+
+    class MyQueryFunction(BaseQueryFunction):
+        prefix = 'func' # you can customize
+
+        @staticmethod
+        def func_to_list(data):
+            return data.split(',')
+
+        @staticmethod
+        def func_to_boolean(data):
+            return data.lower() == 'true'
+
+
+    filter_map = {
+        # this will change to is_active. and value will change True or False
+        'is_active__to_boolean': 'is_active',
+        # string will split by comma and change to tags
+        'tags__to_list': 'tag__in'
+    }
     """
 
     prefix = 'func'
