@@ -41,7 +41,7 @@ class BaseValidStructure(JackalBaseStructure):
 
     valid_data shortcut 을 이용하면 정의하신 구조체를 손쉽게 이용하실 수 있습니다.
 
-    해당 클래스를 상속받은 뒤, jackal settings 내의 VALID_STRUCTURE_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
+    해당 클래스를 상속받은 뒤, JACKAL_SETTINGS 내의 VALID_STRUCTURE_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
 
     ex)
     MyValidStructure(BaseValidStructure):
@@ -77,7 +77,7 @@ class BaseStatusCondition(JackalBaseStructure):
     StatusCondition 를 이용하여 상태 변경의 조건들을 정의해두면, jackal 의 shortcut 함수 중 하나인 status_checker 를 이용하여
     그 어떤 객체의 상태건 모두 한번에 체크가 가능해 집니다.
 
-    해당 클래스를 상속받은 뒤, jackal settings 내의 STATUS_CONDITION_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
+    해당 클래스를 상속받은 뒤, JACKAL_SETTINGS 내의 STATUS_CONDITION_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
 
     ex)
     order_status = {
@@ -146,7 +146,7 @@ class BaseStatusReadable(JackalBaseStructure):
 
     jackal 의 readable_status shortcut 을 이용하여 정의한 구조체에서 손쉽게 사용자 표시용 상태 문자열을 불러오십시오.
 
-    해당 클래스를 상속받은 뒤, jackal settings 내의 STATUS_READABLE_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
+    해당 클래스를 상속받은 뒤, JACKAL_SETTINGS 내의 STATUS_READABLE_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
 
     ex)
     MyStatusReadable(BaseStatusCondition):
@@ -170,7 +170,11 @@ class BaseStatusReadable(JackalBaseStructure):
 
 class BaseQueryFunction:
     """
-    RequestFilter 에서 사용하게 될, 쿼리 함수들을 정의할 수 있는 클래스입니다. 해당 클래스를 상속받고,
+    RequestFilter 에서 사용하게 될, 쿼리 함수들을 정의할 수 있는 클래스입니다.
+
+    해당 클래스를 상속받고, JACKAL_SETTINGS 내의 QUERY_FUNCTION_CLASSES 에 정의한 클래스의 경로를 추가하는 것으로 등록이 완료됩니다.
+
+    등록한 쿼리 함수들은
     """
 
     prefix = 'func'

@@ -21,10 +21,10 @@ class RequestFilterMixin:
             return key, None
 
 
-class BaseRequestFilter(RequestFilterMixin):
-    ordering_key = ''
-    search_type_key = ''
-    search_keyword_key = ''
+class JackalQueryFilter(RequestFilterMixin):
+    ordering_key = 'ordering'
+    search_keyword_key = 'search_keyword'
+    search_type_key = 'search_type'
 
     def __init__(self, queryset, params=None):
         self.queryset = queryset
@@ -87,9 +87,3 @@ class BaseRequestFilter(RequestFilterMixin):
             raise NotFoundException(model=queryset.model, **kwargs)
 
         return obj
-
-
-class JackalRequestFilter(BaseRequestFilter):
-    ordering_key = 'ordering'
-    search_keyword_key = 'search_keyword'
-    search_type_key = 'search_type'

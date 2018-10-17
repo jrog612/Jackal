@@ -1,7 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
-from jackal.filter import JackalRequestFilter
+from jackal.filter import JackalQueryFilter
 from jackal.helpers.dict_helper import JackalDictMapper
 from jackal.settings import jackal_settings
 from jackal.shortcuts import valid_data
@@ -31,7 +31,7 @@ class _GetterMixin:
 
     def get_request_filter_class(self):
         if self.request_filter is None:
-            return JackalRequestFilter
+            return JackalQueryFilter
         return self.request_filter
 
     def get_valid_data(self, request):
@@ -87,7 +87,7 @@ class JackalAPIView(APIView, _ResponseMixin, _GetterMixin):
     user_field = ''
     valid_key = ''
 
-    request_filter = JackalRequestFilter
+    query_filter = JackalQueryFilter
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
