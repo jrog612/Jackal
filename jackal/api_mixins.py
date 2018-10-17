@@ -1,5 +1,5 @@
-from jackal.generics import BaseDetailUpdateDestroyGeneric, BaseListCreateGeneric, PaginateListGeneric, \
-    SimpleGeneric
+from jackal.api_generics import BaseDetailUpdateDestroyGeneric, BaseListCreateGeneric, LabelValueListGeneric, \
+    PaginateListGeneric, SimpleGeneric
 
 
 class DetailMixin(BaseDetailUpdateDestroyGeneric):
@@ -98,3 +98,7 @@ class PatchMixin(SimpleGeneric):
 class DeleteMixin(SimpleGeneric):
     def delete(self, request, **kwargs):
         return self.wrapper(request, method='delete', **kwargs)
+
+
+class LabelValueListMixin(LabelValueListGeneric):
+    pass

@@ -1,3 +1,5 @@
+from rest_framework import serializers
+
 from jackal.api_view import JackalAPIView
 from jackal.paginator import JackalPaginator
 from jackal.shortcuts import model_update
@@ -101,3 +103,24 @@ class SimpleGeneric(JackalAPIView):
 
     def delete_func(self, request, **kwargs):
         pass
+
+
+class LabelValueListGeneric(JackalAPIView):
+    label_field = 'name'
+    value_field = 'id'
+
+    def get_serializer_class(self):
+        class LabelValueSerializer(serializers.ModelSerializer):
+            label = serializers.CharField(source=self.label_field)
+            value = serializers.CharField(source=self.value_field)
+
+            class Meta:
+                model = self.model
+                fields = ('label', 'value')
+
+        return LabelValueSerializer
+
+    def get(self, request, **kwargs):
+        queryset = self.get_filtered_queryset(request, **kwargs)
+        ser_class = self.get_serializer_class()
+        return self.simple_response(ser_class(queryset, many=True))
