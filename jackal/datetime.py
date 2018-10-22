@@ -10,26 +10,55 @@ now_date_for_test = None
 now_time_for_test = None
 
 
-def rel_date(day=0, month=0, year=0):
+def local_date(days=0, months=0, years=0, **kwargs):
     """
-    tomorrow = rel_date(day=1)
-    yesterday = rel_date(day=-1)
-    last_month = rel_date(month=-1)
-    next_month = rel_date(month=1)
+    This function use TIMEZONE of django settings.
+
+    when today is 2018-01-02 # YYYY-MM-DD
+
+    local_date()
+    >>> datetime.date(2018, 1, 2)
+    local_date(days=1)
+    >>> datetime.date(2018, 1, 3)
+    local_date(days=-1)
+    >>> datetime.date(2017, 1, 1)
+    local_date(months=-1)
+    >>> datetime.date(2018, 12, 2)
+    local_date(months=1)
+    >>> datetime.date(2018, 2, 2)
+    local_date(day=1)
+    >>> datetime.date(2018, 1, 1)
+    local_date(day=-1)
+    >>> datetime.date(2018, 1, 31)
+    local_date(day=1, months=1)
+    >>> datetime.date(2018, 2, 1)
+    local_date(day=-1, months=1)
+    >>> datetime.date(2018, 2, 28)
+    local_date(year=2019, month=5, day=18)
+    >>> datetime.date(2019, 5, 18)
+    local_date(day=-1, months=1, days=1)
+    >>> datetime.date(2018, 3, 1)
     """
     today = timezone.localdate()
     if now_date_for_test is not None and settings.DEBUG:
         today = now_date_for_test
 
-    return today + relativedelta(days=day, months=month, year=year)
+    if kwargs.get('day') == -1:
+        kwargs['day'] = get_last_day_of_month(
+            today.year if kwargs.get('year') is None else kwargs.get('year'),
+            today.month if kwargs.get('month') is None else kwargs.get('month')
+        )
+
+    today = today.replace(**kwargs)
+    return today + relativedelta(days=days, months=months, year=years)
 
 
-def rel_time(hour=0, minute=0, second=0):
-    now = timezone.localtime()
+def local_time(hours=0, minutes=0, seconds=0, **kwargs):
+    now = timezone.localtime().replace(**kwargs)
     if now_time_for_test is not None and settings.DEBUG:
         now = now_time_for_test
 
-    return now + timedelta(minutes=minute, hours=hour, seconds=second)
+    return now + timedelta(minutes=minutes, hours=hours, seconds=seconds)
 
 
 def date_range(start, end):
@@ -68,6 +97,9 @@ def change_now(date=None, time=None):
 
 
 def reset_now():
+    """
+    Remember! This method only call in TEST Environment.
+    """
     if not settings.DEBUG:
         raise EnvironmentError('You can run this method only in test')
 
@@ -78,6 +110,10 @@ def reset_now():
 
 
 class InDateTime:
+    """
+    Remember! This method only call in TEST Environment.
+    """
+
     def __init__(self, date=None, time=None):
         self.date = date
         self.time = time
