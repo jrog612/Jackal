@@ -1,5 +1,6 @@
 from rest_framework import serializers
 
+from jackal.settings import jackal_settings
 from jackal.views.base_views import JackalAPIView
 from jackal.paginators import JackalPaginator
 from jackal.shortcuts import model_update
@@ -76,13 +77,16 @@ class BaseDetailUpdateDestroyGeneric(JackalAPIView):
 
 class PaginateListGeneric(JackalAPIView):
     default_page = 1
-    default_limit = 10
+    default_limit = None
 
     def paginated_list(self, request, **kwargs):
         queryset = self.get_filtered_queryset(request, **kwargs)
         return self.paginated_data(request, queryset)
 
     def paginated_data(self, request, queryset):
+        if self.default_limit is None:
+            self.default_limit = jackal_settings.PAGE_LENGTH
+
         paginator = JackalPaginator(queryset, request, self.default_page, self.default_limit)
         response_data = paginator.serialized_data(self.get_serializer_class(), self.get_serializer_context())
         return self.simple_response(response_data)

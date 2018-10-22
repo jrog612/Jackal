@@ -12,6 +12,7 @@ DEFAULTS = {
         'jackal.structure.DefaultQueryFunction',
     ],
     'EXCEPTION_HANDLER': 'jackal.exceptions.jackal_exception_handler',
+    'PAGE_LENGTH': None,
 }
 
 IMPORT_STRINGS = [
@@ -26,7 +27,7 @@ IMPORT_STRINGS = [
 class JackalSettings:
     def __init__(self, custom_settings=None, defaults=None, import_strings=None):
         if custom_settings:
-            self._custom_settings = self.custom_settings
+            self._custom_settings = custom_settings
 
         self.defaults = defaults or DEFAULTS
         self.import_strings = import_strings or IMPORT_STRINGS
@@ -55,7 +56,7 @@ class JackalSettings:
     @property
     def custom_settings(self):
         if not hasattr(self, '_custom_settings'):
-            self._custom_settings = getattr(settings, 'JACKAL_SETTINGS', {})
+            self._custom_settings = getattr(settings, 'JACKAL', {})
         return self._custom_settings
 
     def reload(self):
@@ -91,7 +92,7 @@ jackal_settings = JackalSettings(None, DEFAULTS, IMPORT_STRINGS)
 
 def reload_jackal_settings(*args, **kwargs):
     setting = kwargs['setting']
-    if setting == 'JACKAL_SETTINGS':
+    if setting == 'JACKAL':
         jackal_settings.reload()
 
 
