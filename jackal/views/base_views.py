@@ -4,7 +4,7 @@ from rest_framework.views import APIView
 from jackal.filters import JackalQueryFilter
 from jackal.helpers.dict_helper import JackalDictMapper
 from jackal.settings import jackal_settings
-from jackal.shortcuts import valid_data
+from jackal.shortcuts import inspect_data
 
 
 class _GetterMixin:
@@ -35,7 +35,7 @@ class _GetterMixin:
         return self.request_filter
 
     def get_valid_data(self, request):
-        return valid_data(request.data, self.valid_key)
+        return inspect_data(request.data, self.valid_key)
 
     def get_serializer_class(self):
         return self.serializer_class

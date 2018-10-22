@@ -85,9 +85,9 @@ def remove_None(data, fields=None):
     return copied_data
 
 
-def valid_data(data, key):
+def inspect_data(data, key):
     try:
-        valid_structure = structure_loader('VALID_STRUCTURE_CLASSES')[key]
+        valid_structure = structure_loader('INSPECT_STRUCTURE_CLASSES')[key]
     except KeyError:
         raise StructureException('no valid structure about {} key'.format(key))
 

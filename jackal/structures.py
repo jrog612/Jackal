@@ -21,15 +21,15 @@ class JackalBaseStructure:
         return ret_dict
 
 
-class BaseValidStructure(JackalBaseStructure):
+class BaseInspectStructure(JackalBaseStructure):
     """
-    ValidStructure 는 주어진 딕셔너리를 쉽고 간편하게 검증하게끔 해주는 구조체입니다.
+    InspectStructure 는 주어진 딕셔너리를 쉽고 간편하게 검증하게끔 해주는 구조체입니다.
       - 한 딕셔너리 안에 다양한 데이터가 오지만, 그 중에 필요한 것만 걸러내야 할 때.
       - 딕셔너리 내부의 값들 중 None, 혹은 빈 문자열 등 none_values 에 해당되는 값들을 아예 제외시키고 싶을 때.
       - none_values 를 제외가 아닌, 확실한 None 으로 만들고 싶을 때.
       - 일부 값들은 반드시 존재하고, none_values 가 아니어야 할 때.
 
-    위와 같은 상황은 ValidStructure 를 사용하면 손쉽게 해결됩니다.
+    위와 같은 상황은 InspectStructure 를 사용하면 손쉽게 해결됩니다.
 
     구조체 정의 방법:
         key : {
@@ -41,10 +41,10 @@ class BaseValidStructure(JackalBaseStructure):
 
     valid_data shortcut 을 이용하면 정의하신 구조체를 손쉽게 이용하실 수 있습니다.
 
-    해당 클래스를 상속받은 뒤, JACKAL_SETTINGS 내의 VALID_STRUCTURE_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
+    해당 클래스를 상속받은 뒤, JACKAL_SETTINGS 내의 INSPECT_STRUCTURE_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
 
     ex)
-    MyValidStructure(BaseValidStructure):
+    MyInspectStructure(BaseInspectStructure):
         prefix = 'valid'
 
         valid_auth = {
