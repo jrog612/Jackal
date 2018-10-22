@@ -1,8 +1,13 @@
 from django.core.paginator import EmptyPage, Paginator
 
+from jackal.settings import jackal_settings
+
 
 class JackalPaginator:
-    def __init__(self, queryset, request, default_page=1, default_limit=10):
+    def __init__(self, queryset, request, default_page=1, default_limit=None):
+        if default_limit is None:
+            default_limit = jackal_settings.PAGE_LENGTH if jackal_settings.PAGE_LENGTH else 10
+
         page = request.query_params.get('page_number', default_page)
         if int(page) <= 0:
             page = 1

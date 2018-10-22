@@ -12,6 +12,12 @@ class BaseField:
     def __init__(self, required=False, default=None):
         pass
 
+    def inspect_value(self, value):
+        pass
+
+    def convert_type(self):
+        pass
+
 
 class Inspector(BaseInspector):
     pass
