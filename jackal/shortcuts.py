@@ -1,7 +1,7 @@
 from django.apps import apps
 
 from jackal.exceptions import FieldException, NotFoundException, StructureException
-from jackal.loader import structure_loader
+from jackal.loaders import structure_loader
 
 none_values = [[], {}, '', 'null', None, 'undefined']
 

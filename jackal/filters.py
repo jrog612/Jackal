@@ -1,7 +1,7 @@
 from django.db.models import Q
 
 from jackal.exceptions import NotFoundException
-from jackal.loader import query_function_loader
+from jackal.loaders import query_function_loader
 
 
 class RequestFilterMixin:

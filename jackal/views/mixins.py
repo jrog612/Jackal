@@ -1,4 +1,4 @@
-from jackal.api_generics import BaseDetailUpdateDestroyGeneric, BaseListCreateGeneric, LabelValueListGeneric, \
+from jackal.views.generics import BaseDetailUpdateDestroyGeneric, BaseListCreateGeneric, LabelValueListGeneric, \
     PaginateListGeneric, SimpleGeneric
 
 

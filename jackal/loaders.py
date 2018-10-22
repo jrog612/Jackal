@@ -1,5 +1,5 @@
 from jackal.settings import jackal_settings
-from jackal.structure import JackalBaseStructure, BaseQueryFunction
+from jackal.structures import JackalBaseStructure, BaseQueryFunction
 
 
 def structure_loader(key='VALID_STRUCTURE'):
