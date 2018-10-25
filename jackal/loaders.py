@@ -2,7 +2,7 @@ from jackal.settings import jackal_settings
 from jackal.structures import JackalBaseStructure, BaseQueryFunction
 
 
-def structure_loader(key='VALID_STRUCTURE'):
+def structure_loader(key):
     ret_data = dict()
     for cls in getattr(jackal_settings, key):
         if issubclass(cls, JackalBaseStructure):

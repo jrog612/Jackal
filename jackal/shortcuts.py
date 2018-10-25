@@ -87,7 +87,7 @@ def remove_None(data, fields=None):
 
 def inspect_data(data, key):
     try:
-        valid_structure = structure_loader('INSPECT_STRUCTURE_CLASSES')[key]
+        valid_structure = structure_loader('INSPECT_CLASSES')[key]
     except KeyError:
         raise StructureException('no valid structure about {} key'.format(key))
 

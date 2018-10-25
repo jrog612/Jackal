@@ -5,7 +5,6 @@ from django.conf import settings
 from django.test.signals import setting_changed
 
 DEFAULTS = {
-    'INSPECT_STRUCTURE_CLASSES': [],
     'STATUS_CONDITION_CLASSES': [],
     'STATUS_READABLE_CLASSES': [],
     'QUERY_FUNCTION_CLASSES': [
@@ -16,7 +15,6 @@ DEFAULTS = {
 }
 
 IMPORT_STRINGS = [
-    'INSPECT_STRUCTURE_CLASSES',
     'STATUS_CONDITION_CLASSES',
     'STATUS_READABLE_CLASSES',
     'QUERY_FUNCTION_CLASSES',
