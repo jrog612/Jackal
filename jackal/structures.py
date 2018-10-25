@@ -9,8 +9,9 @@ class JackalBaseStructure:
         사전도, 함수도 아니라면 건너 뜁니다.
         """
         ret_dict = {}
-        for key, value in cls.__dict__.items():
+        for key in cls.__dict__.keys():
             if key.find('{}_'.format(cls.prefix)) == 0:
+                value = getattr(cls, key, {})
                 if callable(value):
                     ret_dict.update(value())
                 elif type(value) is dict:

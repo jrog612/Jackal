@@ -5,7 +5,7 @@ from jackal.structures import JackalBaseStructure, BaseQueryFunction
 def structure_loader(key='VALID_STRUCTURE'):
     ret_data = dict()
     for cls in getattr(jackal_settings, key):
-        if isinstance(cls, JackalBaseStructure):
+        if issubclass(cls, JackalBaseStructure):
             ret_data.update(cls.get_structure())
         else:
             continue
