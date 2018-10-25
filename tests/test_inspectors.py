@@ -20,5 +20,8 @@ class TestInspector(TestCase):
             'required_field': 'required'
         }
 
-    def test_inspector_append(self):
-        pass
+    def test_inspector(self):
+        isp = MyTestInspector(data=self.pre_inspect)
+        post_inspect = isp.inspect()
+
+        assert 'unexpected_field' not in post_inspect

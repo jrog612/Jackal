@@ -42,7 +42,7 @@ class BaseInspectStructure(JackalBaseStructure):
 
     valid_data shortcut 을 이용하면 정의하신 구조체를 손쉽게 이용하실 수 있습니다.
 
-    해당 클래스를 상속받은 뒤, JACKAL_SETTINGS 내의 INSPECT_STRUCTURE_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
+    해당 클래스를 상속받은 뒤, JACKAL_SETTINGS 내의 INSPECT_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
 
     ex)
     MyInspectStructure(BaseInspectStructure):
