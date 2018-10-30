@@ -1,4 +1,5 @@
 from jackal.consts import iterator, none_values
+from jackal.converters import BaseConverter
 from jackal.exceptions import ConvertError
 from jackal.inspectors.consts import Empty, InspectConst, Required, TypeWrong
 from jackal.consts import Unset
@@ -52,37 +53,6 @@ class BaseInspector:
         ins = self.get_const_instance(const_class, pre_value, field_name, field)
         result = ins.handle()
         return result
-
-
-class BaseConverter:
-    default_replacement = {}
-
-    def __init__(self, convert_type, field, replacement=None):
-        self.convert_type = convert_type
-        self.field = field
-        self.replacement = replacement if replacement is not None else self.default_replacement
-
-    def error(self, message, value):
-        return ConvertError(message=message, value=value, field_class=self.field.__class__, field_ins=self.field)
-
-    def convert(self, value, hard=False):
-        try:
-            self.converting(value, hard)
-        except Exception as e:
-            if isinstance(e, ConvertError):
-                raise e
-            else:
-                message = getattr(e, 'message', '{} error raised while jackal inspector convert type.'.format(e))
-                raise self.error(message, value)
-
-    def converting(self, value, hard=False):
-        return self.convert_type(value)
-
-    def replace(self, value):
-        ret_value = value
-        for key, value in self.replacement.items():
-            ret_value = ret_value.replace(key, value)
-        return ret_value
 
 
 class BaseField:
