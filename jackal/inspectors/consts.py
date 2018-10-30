@@ -1,3 +1,8 @@
+__all__ = [
+    'InspectConst', 'Empty', 'Required', 'TypeWrong'
+]
+
+
 class InspectConst:
     is_fail = False
 
@@ -10,10 +15,6 @@ class InspectConst:
 
     def handle(self):
         pass
-
-
-class Unset(InspectConst):
-    pass
 
 
 class Empty(InspectConst):

@@ -80,6 +80,15 @@ class StructureException(MessageException):
     status_code = 500
 
 
+class ConvertError(BaseException):
+    def __init__(self, message, value, field_class, field_ins, default_value=None):
+        self.message = message
+        self.value = value
+        self.field_class = field_class
+        self.field_ins = field_ins
+        self.default_value = default_value
+
+
 def jackal_exception_handler(exc, context):
     if isinstance(exc, JackalAPIException):
         return Response(exc.response_data(), status=exc.status_code)

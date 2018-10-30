@@ -1,5 +1,7 @@
 from jackal.consts import iterator, none_values
-from jackal.inspectors.consts import Empty, InspectConst, Required, TypeWrong, Unset
+from jackal.exceptions import ConvertError
+from jackal.inspectors.consts import Empty, InspectConst, Required, TypeWrong
+from jackal.consts import Unset
 
 
 class BaseInspector:
@@ -52,21 +54,62 @@ class BaseInspector:
         return result
 
 
+class BaseConverter:
+    default_replacement = {}
+
+    def __init__(self, convert_type, field, replacement=None):
+        self.convert_type = convert_type
+        self.field = field
+        self.replacement = replacement if replacement is not None else self.default_replacement
+
+    def error(self, message, value):
+        return ConvertError(message=message, value=value, field_class=self.field.__class__, field_ins=self.field)
+
+    def convert(self, value, hard=False):
+        try:
+            self.converting(value, hard)
+        except Exception as e:
+            if isinstance(e, ConvertError):
+                raise e
+            else:
+                message = getattr(e, 'message', '{} error raised while jackal inspector convert type.'.format(e))
+                raise self.error(message, value)
+
+    def converting(self, value, hard=False):
+        return self.convert_type(value)
+
+    def replace(self, value):
+        ret_value = value
+        for key, value in self.replacement.items():
+            ret_value = ret_value.replace(key, value)
+        return ret_value
+
+
 class BaseField:
     field_type = None
+    default_converter = BaseConverter
 
-    def __init__(self, required=False, check_type=False, skip_convert=False, *args, **kwargs):
-        self.is_required = required
-        self.is_check_type = check_type
-        self.skip_convert = skip_convert
-        self.args = args
-        self.default_value = self.kwargs.pop('default', Empty)
-        self.kwargs = kwargs
+    def __init__(self, required=False, check_type=False,
+                 skip_convert=False, except_to_default=True,
+                 hard=False, converter_class=None, replacement=None, **kwargs):
         self.initial_value = Unset
         self.inspected_value = Unset
 
-    @property
-    def _default_value(self):
+        self.is_required = required
+        self.is_check_type = check_type
+        self.skip_convert = skip_convert
+        self.hard = hard
+        self.default_value = self.kwargs.pop('default', Empty)
+        self.kwargs = kwargs
+        self.replacement = replacement
+
+        self.except_to_default = False if self.default_value is Empty else except_to_default
+        self.converter_class = self.default_converter if converter_class is None else converter_class
+
+    def get_converter(self):
+        return self.converter_class(self.field_type, self, self.replacement)
+
+    def get_default_value(self):
         if self.default_value is Empty:
             return Empty
         if callable(self.default_value):
@@ -77,21 +120,37 @@ class BaseField:
     def inspect_value(self, value):
         """
         1. check required.
-        2. check type.
-        3. convert type.
+        2. convert type.
+        3. check type.
         4. set default
         """
         self.initial_value = value
+        inspecting = value
 
-        if not self.check_required(value):
-            return Required
-        if not self.check_type(value):
-            return TypeWrong
+        try:
+            if not self.check_required(inspecting):
+                return Required
 
-        converted_value = self.convert_type(value)
+            if not self.skip_convert:
+                inspecting = self.converting(inspecting)
 
-        self.inspected_value = converted_value
-        return converted_value
+            if not self.check_type(inspecting):
+                return TypeWrong
+
+            self.inspected_value = inspecting
+            return inspecting
+
+        except Exception as e:
+            if self.except_to_default:
+                return self.get_default_value()
+            else:
+                raise e
+
+    def converting(self, value):
+        converter = self.get_converter()
+        ret_value = value
+        ret_value = converter.replace(ret_value)
+        return converter.convert(ret_value, self.hard)
 
     def check_required(self, value):
         return not (self.is_required and value in none_values)
@@ -103,8 +162,3 @@ class BaseField:
             else:
                 return type(value) is self.field_type
         return True
-
-    def convert_type(self, value):
-        if self.skip_convert:
-            return value
-        return None
