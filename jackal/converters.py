@@ -19,7 +19,7 @@ class BaseConverter:
             if isinstance(e, ConvertError):
                 raise e
             else:
-                message = getattr(e, 'message', '{} error raised while jackal inspector convert type.'.format(e))
+                message = getattr(e, 'message', '{} error raised while jackal inspector converting type.'.format(e))
                 raise self.error(message, value)
 
     def converting(self, value, hard=False):
