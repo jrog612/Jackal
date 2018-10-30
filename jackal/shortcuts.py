@@ -1,9 +1,8 @@
 from django.apps import apps
 
+from jackal.consts import none_values
 from jackal.exceptions import FieldException, NotFoundException, StructureException
 from jackal.loaders import structure_loader
-
-none_values = [[], {}, '', 'null', None, 'undefined']
 
 
 def get_object_or_None(model, **fields):
