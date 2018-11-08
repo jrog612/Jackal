@@ -28,17 +28,6 @@ def get_model(model_name):
     return apps.get_model(model_name)
 
 
-def status_setter(obj, status, key, commit=True, status_field='status'):
-    if not status_checker(status, obj.status, key):
-        return False
-
-    setattr(obj, status_field, status)
-
-    if commit:
-        obj.save()
-    return True
-
-
 def operating(a, oper, b):
     if oper == '==':
         return a == b
