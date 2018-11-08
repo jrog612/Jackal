@@ -22,52 +22,6 @@ class JackalBaseStructure:
         return ret_dict
 
 
-class BaseInspectStructure(JackalBaseStructure):
-    """
-    InspectStructure 는 주어진 딕셔너리를 쉽고 간편하게 검증하게끔 해주는 구조체입니다.
-      - 한 딕셔너리 안에 다양한 데이터가 오지만, 그 중에 필요한 것만 걸러내야 할 때.
-      - 딕셔너리 내부의 값들 중 None, 혹은 빈 문자열 등 none_values 에 해당되는 값들을 아예 제외시키고 싶을 때.
-      - none_values 를 제외가 아닌, 확실한 None 으로 만들고 싶을 때.
-      - 일부 값들은 반드시 존재하고, none_values 가 아니어야 할 때.
-
-    위와 같은 상황은 InspectStructure 를 사용하면 손쉽게 해결됩니다.
-
-    구조체 정의 방법:
-        key : {
-            'expected': 이곳에 적힌 필드들만 허용합니다. 적혀있지 않은 필드는 모두 제외됩니다.
-            'required': 이곳에 적힌 필드는 필수가 됩니다. 만약 값이 none_values 에 해당되거나, 존재하지 않는다면 FieldException 을 raise 합니다.
-            'default': 이곳에 적힌 필드가 none_values 에 해당되면, 아예 제외시킵니다.
-            'null': 이곳에 적힌 필드가 none_values 에 해당되면 파이선의 None 값으로 변경시킵니다.
-        }
-
-    valid_data shortcut 을 이용하면 정의하신 구조체를 손쉽게 이용하실 수 있습니다.
-
-    해당 클래스를 상속받은 뒤, JACKAL_SETTINGS 내의 INSPECT_CLASSES 에 클래스의 경로를 추가하면, 등록이 완료됩니다.
-
-    ex)
-    MyInspectStructure(BaseInspectStructure):
-        prefix = 'valid'
-
-        valid_auth = {
-            'user_signup': {
-                'expected': ('username', 'password', 'email', 'name', 'is_active),
-                'required': ('username', 'password'),
-                'default': ('is_active', ),
-                'null': ('name', 'email')
-            }
-        }
-
-    valid_data(data={'username': 'test_user', 'password': 'test_password', 'email': 'test@test.com', 'test': 'test', 'is_active': '', 'name': ''}, key='user_signup')
-    // test 필드는 expected 에 없기에 제외되고, name 은 null 에 있으니 빈문자열에서 None 으로 바뀝니다.
-    >> result: {'username': 'test_user", 'password': 'test_password', 'email': 'test@test.com', 'name': None}
-
-    valid_data(data={'username': 'test_user', 'password': '', 'email': 'test@test.com', 'test': 'test', 'is_active': '', 'name': ''}, key='user_signup')
-    // required 내에 있는 password 필드가 비어있기 때문에 FieldException 에러가 raise 됩니다.
-    >> result: FieldException(field='password', massage='required') raised.
-    """
-    pass
-
-
 class BaseStatusCondition(JackalBaseStructure):
     """
     StatusCondition 는 시스템 로직에서 필요한 다양한 상태 값의 변경에 대한 조건 체크를 용의하게 해주는 구조체입니다.
