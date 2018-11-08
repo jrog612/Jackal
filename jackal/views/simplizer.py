@@ -1,7 +1,5 @@
 from rest_framework.response import Response
 
-from jackal.settings import jackal_settings
-
 
 class ResponseSimplizer:
     def success(self, detail='success', **kwargs):
@@ -18,4 +16,3 @@ class ResponseSimplizer:
 
     def internal_server_error(self, data):
         return Response(data, status=500)
-

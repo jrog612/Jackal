@@ -20,7 +20,7 @@ class BaseListCreateGeneric(JackalAPIView):
 
     def list(self, request, **kwargs):
         if self.list_mixin is None:
-            serializer_class = self.get_serializer_class()
+            serializer_class = self.get_serializer_class(request)
             filtered_queryset = self.get_filtered_queryset(request, **kwargs)
             ser = serializer_class(instance=filtered_queryset, many=True)
             return self.simple_response(ser.data)
@@ -29,8 +29,8 @@ class BaseListCreateGeneric(JackalAPIView):
 
     def create(self, request, **kwargs):
         if self.create_mixin is None:
-            data = self.get_valid_data(request)
-            obj = self.get_model().objects.create(**data)
+            model = self.get_model(request)
+            obj = model.objects.create(**request.inspected_data)
             return self.success(id=obj.id)
         else:
             result = self.create_mixin(request, **kwargs)
@@ -57,8 +57,7 @@ class BaseDetailUpdateDestroyGeneric(JackalAPIView):
     def update(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
         if self.update_mixin is None:
-            data = self.get_valid_data(request)
-            model_update(obj, **data)
+            model_update(obj, **request.inspected_data)
             return self.success(id=obj.id)
 
         else:
@@ -88,7 +87,7 @@ class PaginateListGeneric(JackalAPIView):
             self.default_limit = jackal_settings.PAGE_LENGTH
 
         paginator = JackalPaginator(queryset, request, self.default_page, self.default_limit)
-        response_data = paginator.serialized_data(self.get_serializer_class(), self.get_serializer_context())
+        response_data = paginator.serialized_data(self.get_serializer_class(request), self.get_serializer_context())
         return self.simple_response(response_data)
 
 
@@ -113,7 +112,7 @@ class LabelValueListGeneric(JackalAPIView):
     label_field = 'name'
     value_field = 'id'
 
-    def get_serializer_class(self):
+    def get_serializer_class(self, request):
         class LabelValueSerializer(serializers.ModelSerializer):
             label = serializers.CharField(source=self.label_field)
             value = serializers.CharField(source=self.value_field)
@@ -126,7 +125,7 @@ class LabelValueListGeneric(JackalAPIView):
 
     def get(self, request, **kwargs):
         queryset = self.get_filtered_queryset(request, **kwargs)
-        ser_class = self.get_serializer_class()
+        ser_class = self.get_serializer_class(request)
         return self.simple_response(ser_class(queryset, many=True))
 
 

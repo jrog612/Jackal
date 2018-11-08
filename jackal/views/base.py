@@ -8,34 +8,28 @@ from jackal.views.simplizer import ResponseSimplizer
 
 
 class _Getter:
-    model = None
-    queryset = None
-    serializer_class = None
-    inspect_map = None
-    inspector_class = BaseInspector
-
-    def get_queryset(self):
+    def get_queryset(self, request):
         return self.queryset
 
-    def get_model(self):
+    def get_model(self, request):
         return self.model
 
-    def get_lookup_map(self, **additional):
+    def get_lookup_map(self, request, **additional):
         d = self.lookup_map
         d.update(additional)
         return d
 
-    def get_filter_map(self, **additional):
+    def get_filter_map(self, request, **additional):
         d = self.filter_map
         d.update(additional)
         return d
 
-    def get_extra_kwargs(self, **additional):
+    def get_extra_kwargs(self, request, **additional):
         d = self.extra_kwargs
         d.update(additional)
         return d
 
-    def get_query_filter_class(self):
+    def get_query_filter_class(self, request):
         if self.query_filter is None:
             return JackalQueryFilter
         return self.query_filter
@@ -43,49 +37,44 @@ class _Getter:
     def get_serializer_class(self, request):
         return self.serializer_class
 
-    def get_serializer_context(self):
+    def get_serializer_context(self, request):
         return {}
 
-    def get_jackal_exception_handler(self):
+    def get_jackal_exception_handler(self, request):
         return jackal_settings.EXCEPTION_HANDLER
 
     def get_inspector(self, request):
-        inspect_map = self.get_inspect_map(request.method)
+        inspect_map = self.get_inspect_map(request)
         if not inspect_map:
             return dict()
         ins_class = self.inspector_class
         return ins_class(request.data, inspect_map)
 
-    def get_inspect_map(self, method=''):
-        if not method:
+    def get_inspect_map(self, request):
+        if not request:
             return self.inspect_map
 
-        inspect_map = getattr(self, '{}_inspect_map'.format(method), self.inspect_map)
+        inspect_map = getattr(self, '{}_inspect_map'.format(request), self.inspect_map)
         return inspect_map
 
     def get_inspect_data(self, request):
         inspector = self.get_inspector(request)
         return inspector.inspected_data
 
+    def get_user_field(self, request):
+        return self.user_field
+
 
 class _Override:
+    """
+    Override class contains overriding methods in APIView of rest framework
+    """
+
     def dispatch(self, request, *args, **kwargs):
         self.pre_dispatch(request, *args, **kwargs)
         response = super().dispatch(request, *args, **kwargs)
         self.post_dispatch(request, response, *args, **kwargs)
         return response
-
-    def pre_dispatch(self, request, *args, **kwargs):
-        """
-        This will call before dispatch. before permission check, before authenticate, before initial request...
-        """
-        pass
-
-    def post_dispatch(self, request, response, *args, **kwargs):
-        """
-        This will call after dispatch. after all api view logic. So it receive response to argument.
-        """
-        pass
 
     def handle_exception(self, exc):
         """
@@ -105,23 +94,82 @@ class _Override:
         request.inspect_data = self.get_inspect_data(request)
         return request
 
+    def initial(self, request, *args, **kwargs):
+        super().initial(request, *args, **kwargs)
+        self.pre_method_call(request, *args, **kwargs)
 
-class JackalBaseAPIView(APIView, _Getter, _Override):
+    def finalize_response(self, request, response, *args, **kwargs):
+        super().post_method_call(request, response, *args, **kwargs)
+        return super().finalize_response(request, response, *args, **kwargs)
+
+    def check_permissions(self, request):
+        self.pre_check_permissions(request)
+        super().check_permissions(request)
+        self.post_check_permissions(request)
+
+    def check_object_permissions(self, request, obj):
+        self.pre_check_object_permissions(request, obj)
+        super().check_object_permissions(request, obj)
+        self.post_check_object_permissions(request, obj)
+
+
+class _PrePost:
+    def pre_method_call(self, request, *args, **kwargs):
+        """
+        This will call before method run. Likes get, post, patch...
+        """
+        pass
+
+    def post_method_call(self, request, response, *args, **kwargs):
+        """
+        This will call after method run. Likes get, post, patch...
+        """
+        pass
+
+    def pre_dispatch(self, request, *args, **kwargs):
+        """
+        This will call before dispatch. before permission check, before authenticate, before initial request...
+        """
+        pass
+
+    def post_dispatch(self, request, response, *args, **kwargs):
+        """
+        This will call after dispatch. after all api view logic. So it receive response to argument.
+        """
+        pass
+
+    def pre_check_permissions(self, request):
+        pass
+
+    def post_check_permissions(self, request):
+        pass
+
+    def pre_check_object_permissions(self, request, obj):
+        pass
+
+    def post_check_object_permissions(self, request, obj):
+        pass
+
+
+class JackalBaseAPIView(APIView, _Getter, _Override, _PrePost):
     default_permission_classes = ()
     default_authentication_classes = ()
-
     permission_classes = ()
     authentication_classes = ()
 
+    model = None
+    queryset = None
+
     lookup_map = {}
     filter_map = {}
-
     search_dict = {}
     extra_kwargs = {}
-
+    inspect_map = None
     user_field = ''
 
+    serializer_class = None
     query_filter = JackalQueryFilter
+    inspector_class = BaseInspector
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -129,10 +177,12 @@ class JackalBaseAPIView(APIView, _Getter, _Override):
         self.authentication_classes += self.default_authentication_classes
 
     def get_object(self, request, **kwargs):
-        f_class = self.get_query_filter_class()
-        f = f_class(queryset=self.get_model().objects.all(), params=request.query_params)
+        queryset = self.get_user_queryset(self.get_model(request).objects.all(), request)
 
-        lookup_map = self.get_lookup_map()
+        f_class = self.get_query_filter_class(request)
+        f = f_class(queryset=queryset, params=request.query_params)
+
+        lookup_map = self.get_lookup_map(request)
         extra_kwargs = self.get_extra_kwargs(**JackalDictMapper.av2bv(lookup_map, kwargs))
 
         obj = f.extra(**extra_kwargs).get(raise_404=True)
@@ -140,20 +190,25 @@ class JackalBaseAPIView(APIView, _Getter, _Override):
         return obj
 
     def get_filtered_queryset(self, request, **kwargs):
-        f_class = self.get_query_filter_class()
-        f = f_class(queryset=self.get_queryset(), params=request.query_params)
+        queryset = self.get_user_queryset(self.get_queryset(request), request)
 
-        lookup_map = self.get_lookup_map()
-        filter_map = self.get_filter_map()
+        f_class = self.get_query_filter_class(request)
+        f = f_class(queryset=queryset, params=request.query_params)
 
-        if self.user_field:
-            extra_kwargs = self.get_extra_kwargs(**{self.user_field: request.user})
-        else:
-            extra_kwargs = self.get_extra_kwargs()
-
+        lookup_map = self.get_lookup_map(request)
+        filter_map = self.get_filter_map(request)
+        extra_kwargs = self.get_extra_kwargs(request)
         extra_kwargs.update(JackalDictMapper.av2bv(lookup_map, kwargs))
-        f = f.filter_map(filter_map).extra(**extra_kwargs)
-        return f.queryset
+
+        queryset = f.filter_map(filter_map).extra(**extra_kwargs).queryset
+        return queryset
+
+    def get_user_queryset(self, queryset, request):
+        user_field = self.get_user_field(request)
+        if user_field is not None:
+            queryset = queryset.filter(**{user_field: request.user})
+
+        return queryset
 
 
 class JackalAPIView(JackalBaseAPIView, ResponseSimplizer):
