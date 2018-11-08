@@ -1,13 +1,19 @@
-from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jackal.filters import JackalQueryFilter
 from jackal.helpers.dict_helper import JackalDictMapper
+from jackal.inspectors import BaseInspector
 from jackal.settings import jackal_settings
-from jackal.shortcuts import inspect_data
+from jackal.views.simplizer import ResponseSimplizer
 
 
-class _GetterMixin:
+class _Getter:
+    model = None
+    queryset = None
+    serializer_class = None
+    inspect_map = None
+    inspector_class = BaseInspector
+
     def get_queryset(self):
         return self.queryset
 
@@ -29,15 +35,12 @@ class _GetterMixin:
         d.update(additional)
         return d
 
-    def get_request_filter_class(self):
-        if self.request_filter is None:
+    def get_query_filter_class(self):
+        if self.query_filter is None:
             return JackalQueryFilter
-        return self.request_filter
+        return self.query_filter
 
-    def get_valid_data(self, request):
-        return inspect_data(request.data, self.valid_key)
-
-    def get_serializer_class(self):
+    def get_serializer_class(self, request):
         return self.serializer_class
 
     def get_serializer_context(self):
@@ -46,65 +49,37 @@ class _GetterMixin:
     def get_jackal_exception_handler(self):
         return jackal_settings.EXCEPTION_HANDLER
 
+    def get_inspector(self, request):
+        inspect_map = self.get_inspect_map(request.method)
+        if not inspect_map:
+            return dict()
+        ins_class = self.inspector_class
+        return ins_class(request.data, inspect_map)
 
-class _ResponseMixin:
-    @staticmethod
-    def success(detail='success', **kwargs):
-        return Response({'detail': detail, **kwargs})
+    def get_inspect_map(self, method=''):
+        if not method:
+            return self.inspect_map
 
-    @staticmethod
-    def simple_response(result=None, status=200, headers=None, **kwargs):
-        return Response(result, status=status, headers=headers, **kwargs)
+        inspect_map = getattr(self, '{}_inspect_map'.format(method), self.inspect_map)
+        return inspect_map
 
-    @staticmethod
-    def bad_request(data):
-        return Response(data, status=400)
-
-    @staticmethod
-    def forbidden(data):
-        return Response(data, status=403)
-
-    @staticmethod
-    def internal_server_error(data):
-        return Response(data, status=500)
+    def get_inspect_data(self, request):
+        inspector = self.get_inspector(request)
+        return inspector.inspected_data
 
 
-class JackalAPIView(APIView, _ResponseMixin, _GetterMixin):
-    default_permission_classes = ()
-    default_authentication_classes = ()
-
-    permission_classes = ()
-    authentication_classes = ()
-
-    model = None
-    queryset = None
-    serializer_class = None
-    lookup_map = {}
-    extra_kwargs = {}
-    filter_map = {}
-    search_dict = {}
-
-    user_field = ''
-    valid_key = ''
-
-    query_filter = JackalQueryFilter
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.permission_classes += self.default_permission_classes
-        self.authentication_classes += self.default_authentication_classes
+class _Override:
+    def dispatch(self, request, *args, **kwargs):
+        self.pre_dispatch(request, *args, **kwargs)
+        response = super().dispatch(request, *args, **kwargs)
+        self.post_dispatch(request, response, *args, **kwargs)
+        return response
 
     def pre_dispatch(self, request, *args, **kwargs):
         """
         This will call before dispatch. before permission check, before authenticate, before initial request...
         """
         pass
-
-    def dispatch(self, request, *args, **kwargs):
-        self.pre_dispatch(request, *args, **kwargs)
-        response = super().dispatch(request, *args, **kwargs)
-        self.post_dispatch(request, response, *args, **kwargs)
-        return response
 
     def post_dispatch(self, request, response, *args, **kwargs):
         """
@@ -125,8 +100,36 @@ class JackalAPIView(APIView, _ResponseMixin, _GetterMixin):
         else:
             return super().handle_exception(exc)
 
+    def initialize_request(self, request, *args, **kwargs):
+        request = super().initialize_request(request, *args, **kwargs)
+        request.inspect_data = self.get_inspect_data(request)
+        return request
+
+
+class JackalBaseAPIView(APIView, _Getter, _Override):
+    default_permission_classes = ()
+    default_authentication_classes = ()
+
+    permission_classes = ()
+    authentication_classes = ()
+
+    lookup_map = {}
+    filter_map = {}
+
+    search_dict = {}
+    extra_kwargs = {}
+
+    user_field = ''
+
+    query_filter = JackalQueryFilter
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.permission_classes += self.default_permission_classes
+        self.authentication_classes += self.default_authentication_classes
+
     def get_object(self, request, **kwargs):
-        f_class = self.get_request_filter_class()
+        f_class = self.get_query_filter_class()
         f = f_class(queryset=self.get_model().objects.all(), params=request.query_params)
 
         lookup_map = self.get_lookup_map()
@@ -137,7 +140,7 @@ class JackalAPIView(APIView, _ResponseMixin, _GetterMixin):
         return obj
 
     def get_filtered_queryset(self, request, **kwargs):
-        f_class = self.get_request_filter_class()
+        f_class = self.get_query_filter_class()
         f = f_class(queryset=self.get_queryset(), params=request.query_params)
 
         lookup_map = self.get_lookup_map()
@@ -151,3 +154,7 @@ class JackalAPIView(APIView, _ResponseMixin, _GetterMixin):
         extra_kwargs.update(JackalDictMapper.av2bv(lookup_map, kwargs))
         f = f.filter_map(filter_map).extra(**extra_kwargs)
         return f.queryset
+
+
+class JackalAPIView(JackalBaseAPIView, ResponseSimplizer):
+    pass

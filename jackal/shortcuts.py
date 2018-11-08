@@ -1,7 +1,6 @@
 from django.apps import apps
 
-from jackal.consts import none_values
-from jackal.exceptions import FieldException, NotFoundException, StructureException
+from jackal.exceptions import NotFoundException
 from jackal.loaders import structure_loader
 
 
@@ -27,92 +26,6 @@ def model_update(instance, **fields):
 
 def get_model(model_name):
     return apps.get_model(model_name)
-
-
-def remove_unexpected(data, expected):
-    """
-    기대하지 않은 값들 모두 제외
-    """
-    expected_dict = {key: value for key, value in data.items() if key in expected}
-    return expected_dict
-
-
-def check_required(data, required):
-    """
-    필수값 체크용 함수
-    """
-    if required == '*':
-        required = data.keys()
-
-    for req in required:
-        if data.get(req) in none_values:
-            raise FieldException(field=req, message='Required')
-    return True
-
-
-def change_None(data, fields=None):
-    """
-    None, '', 'null', 'undefined' 를 모두 None 으로 변환하는 함수. fields 를 주면 해당 fields 내에 있는 것들만 변환합니다.
-    """
-    copied_data = data.copy()
-    if fields == '*':
-        fields = None
-
-    for key, value in data.items():
-        if value in none_values:
-            if fields is None:
-                copied_data[key] = None
-            elif key in fields:
-                copied_data[key] = None
-    return copied_data
-
-
-def remove_None(data, fields=None):
-    """
-    None, '', 'null', 'undefined' 를 모두 제외합니다. fields 를 주면 해당 fields 만 검사합니다.
-    """
-    copied_data = data.copy()
-    if fields == '*':
-        fields = None
-
-    for key, value in data.items():
-        if value in none_values:
-            if fields is None:
-                copied_data.pop(key)
-            elif key in fields:
-                copied_data.pop(key)
-    return copied_data
-
-
-def inspect_data(data, key):
-    try:
-        valid_structure = structure_loader('INSPECT_CLASSES')[key]
-    except KeyError:
-        raise StructureException('no valid structure about {} key'.format(key))
-
-    filtered = data
-
-    # 예상하지 못한 필드들은 제외
-    expected = valid_structure.get('expected', None)
-    if expected is not None:
-        filtered = remove_unexpected(data, expected)
-
-    # 필수 값 체크
-    required = valid_structure.get('required', None)
-    if required is not None:
-        check_required(filtered, required=required)
-
-    # 공백을 허용하지 않는 값 None 처리
-    null_array = valid_structure.get('null', None)
-    if null_array is not None:
-        filtered = change_None(filtered, valid_structure['null'])
-
-    # 디폴드 값이 있어서 빈 값이나 None 을 허용하지 않는 필드 제외
-    default_array = valid_structure.get('default', None)
-    if default_array is not None:
-        filtered = remove_None(filtered, valid_structure['default'])
-
-    return filtered
 
 
 def status_setter(obj, status, key, commit=True, status_field='status'):

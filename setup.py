@@ -23,7 +23,7 @@ setup(
     author='Yongjin Jo',
     author_email='wnrhd114@gmail.com',
     lisence='MIT',
-    packages=find_packages(exclude=['tests*']),
+    packages=find_packages(exclude=['tests*', '.*']),
     zip_safe=False,
     classifiers=[
         "Programming Language :: Python :: 3.7",
