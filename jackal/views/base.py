@@ -1,10 +1,27 @@
+from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jackal.filters import JackalQueryFilter
 from jackal.helpers.dict_helper import JackalDictMapper
 from jackal.inspectors import BaseInspector
 from jackal.settings import jackal_settings
-from jackal.views.simplizer import ResponseSimplizer
+
+
+class _Response:
+    def success(self, detail='success', **kwargs):
+        return Response({'detail': detail, **kwargs})
+
+    def simple_response(self, result=None, status=200, headers=None, **kwargs):
+        return Response(result, status=status, headers=headers, **kwargs)
+
+    def bad_request(self, **data):
+        return Response(data, status=400)
+
+    def forbidden(self, **data):
+        return Response(data, status=403)
+
+    def internal_server_error(self, **data):
+        return Response(data, status=500)
 
 
 class _Getter:
@@ -152,7 +169,7 @@ class _PrePost:
         pass
 
 
-class JackalBaseAPIView(APIView, _Getter, _Override, _PrePost):
+class JackalBaseAPIView(APIView, _Getter, _Override, _PrePost, _Response):
     default_permission_classes = ()
     default_authentication_classes = ()
     permission_classes = ()
@@ -212,5 +229,5 @@ class JackalBaseAPIView(APIView, _Getter, _Override, _PrePost):
         return queryset
 
 
-class JackalAPIView(JackalBaseAPIView, ResponseSimplizer):
+class JackalAPIView(JackalBaseAPIView):
     pass
