@@ -46,18 +46,18 @@ class _Getter:
         d = self.extra_kwargs
         return {**d, **additional}
 
-    def get_query_filter_class(self, ):
+    def get_query_filter_class(self):
         if self.query_filter is None:
             return JackalQueryFilter
         return self.query_filter
 
-    def get_serializer_class(self, ):
+    def get_serializer_class(self):
         return self.serializer_class
 
     def get_serializer_context(self):
         return {}
 
-    def get_jackal_exception_handler(self, ):
+    def get_jackal_exception_handler(self):
         return jackal_settings.EXCEPTION_HANDLER
 
     def get_inspector(self, request):
