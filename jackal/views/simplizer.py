@@ -8,11 +8,11 @@ class ResponseSimplizer:
     def simple_response(self, result=None, status=200, headers=None, **kwargs):
         return Response(result, status=status, headers=headers, **kwargs)
 
-    def bad_request(self, data):
+    def bad_request(self, **data):
         return Response(data, status=400)
 
-    def forbidden(self, data):
+    def forbidden(self, **data):
         return Response(data, status=403)
 
-    def internal_server_error(self, data):
+    def internal_server_error(self, **data):
         return Response(data, status=500)

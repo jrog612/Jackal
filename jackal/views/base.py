@@ -38,7 +38,7 @@ class _Getter:
         return self.serializer_class
 
     def get_serializer_context(self, request):
-        return {}
+        return {'request': request}
 
     def get_jackal_exception_handler(self, request):
         return jackal_settings.EXCEPTION_HANDLER
@@ -50,11 +50,12 @@ class _Getter:
         ins_class = self.inspector_class
         return ins_class(request.data, inspect_map)
 
-    def get_inspect_map(self, request):
+    def get_inspect_map(self, request, **additional):
         if not request:
             return self.inspect_map
 
         inspect_map = getattr(self, '{}_inspect_map'.format(request), self.inspect_map)
+        inspect_map.update(additional)
         return inspect_map
 
     def get_inspect_data(self, request):
