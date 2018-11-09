@@ -19,11 +19,11 @@ class _Getter:
             value.get('type_to') is not None
         }
 
-        # def get_validate_fields(self):
-        #     return {
-        #         key: value.get('validator') for key, value in self.map.items() if
-        #         value.get('validator') is not None
-        #     }
+    # def get_validate_fields(self):
+    #     return {
+    #         key: value.get('validator') for key, value in self.map.items() if
+    #         value.get('validator') is not None
+    #     }
 
     def get_if_null_fields(self):
         return {
