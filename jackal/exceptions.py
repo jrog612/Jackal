@@ -28,7 +28,7 @@ class MessageException(JackalAPIException):
         return {'message': self.message, **self.kwargs}
 
 
-class NotFoundException(MessageException):
+class NotFound(MessageException):
     status_code = 404
 
     def __init__(self, model, filters, context=None, **kwargs):
@@ -46,15 +46,15 @@ class NotFoundException(MessageException):
         return {'message': self.message, 'model': self.model.__name__, **self.kwargs}
 
 
-class ForbiddenException(MessageException):
+class Forbidden(MessageException):
     status_code = 403
 
 
-class BadRequestException(MessageException):
+class BadRequest(MessageException):
     status_code = 400
 
 
-class AlreadyExistException(MessageException):
+class AlreadyExist(MessageException):
     default_message = 'data already exists'
     status_code = 400
 

@@ -8,7 +8,7 @@ DEFAULTS = {
     'STATUS_CONDITION_CLASSES': [],
     'STATUS_READABLE_CLASSES': [],
     'QUERY_FUNCTION_CLASSES': [
-        'jackal.structure.DefaultQueryFunction',
+        'jackal.structures.DefaultQueryFunction',
     ],
     'EXCEPTION_HANDLER': 'jackal.exceptions.jackal_exception_handler',
     'PAGE_LENGTH': None,

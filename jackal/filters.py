@@ -1,7 +1,8 @@
 from django.db.models import Q
 
-from jackal.exceptions import NotFoundException
+from jackal.exceptions import NotFound
 from jackal.loaders import query_function_loader
+from jackal.shortcuts import iterable
 
 
 class RequestFilterMixin:
@@ -22,7 +23,6 @@ class RequestFilterMixin:
 
 
 class JackalQueryFilter(RequestFilterMixin):
-
     ordering_key = 'ordering'
     search_keyword_key = 'search_keyword'
     search_type_key = 'search_type'
@@ -60,10 +60,10 @@ class JackalQueryFilter(RequestFilterMixin):
             elif callback is not None:
                 param_value = callback(param_value)
 
-            if type(filter_keyword) is str:
-                filterable[filter_keyword] = param_value
-            else:
+            if iterable(filter_keyword):
                 filterable_q_objects.append(self.get_q_object(param_value, *filter_keyword))
+            else:
+                filterable[filter_keyword] = param_value
 
         self.queryset = queryset.filter(*filterable_q_objects, **filterable).distinct()
         return self
@@ -73,14 +73,16 @@ class JackalQueryFilter(RequestFilterMixin):
         """
         queryset = self.queryset
 
-        keyword = self.params.get(self.search_keyword_key)
-        dict_value = search_dict.get(self.params.get(self.search_type_key))
+        search_keyword = self.params.get(self.search_keyword_key)
+        search_type = self.params.get(self.search_type_key, 'all')
 
-        if dict_value is not None:
-            if type(dict_value) is str:
-                self.queryset = queryset.filter(**{dict_value: keyword})
+        dict_value = search_dict.get(search_type, None)
+
+        if dict_value is not None and search_keyword is not None:
+            if iterable(dict_value):
+                self.queryset = queryset.filter(self.get_q_object(search_keyword, *dict_value))
             else:
-                self.queryset = queryset.filter(self.get_q_object(keyword, *dict_value))
+                self.queryset = queryset.filter(**{dict_value: search_keyword})
         return self
 
     def extra(self, **extra_kwargs):
@@ -106,6 +108,6 @@ class JackalQueryFilter(RequestFilterMixin):
         queryset = self.queryset
         obj = self.queryset.filter(**kwargs).first()
         if obj is None and raise_404:
-            raise NotFoundException(model=queryset.model, filters=kwargs)
+            raise NotFound(model=queryset.model, filters=kwargs)
 
         return obj

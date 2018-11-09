@@ -1,7 +1,14 @@
+import collections
+
+import six
 from django.apps import apps
 
-from jackal.exceptions import NotFoundException
+from jackal.exceptions import NotFound
 from jackal.loaders import structure_loader
+
+
+def iterable(arg):
+    return isinstance(arg, collections.Iterable) and not isinstance(arg, six.string_types)
 
 
 def get_object_or_None(model, **fields):
@@ -12,7 +19,7 @@ def get_object_or_None(model, **fields):
 def get_object_or_404(model, **fields):
     obj = get_object_or_None(model, **fields)
     if obj is None:
-        raise NotFoundException(model, fields)
+        raise NotFound(model, fields)
     return obj
 
 
