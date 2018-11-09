@@ -16,7 +16,7 @@ def get_version():
 setup(
     name='django_jackal',
     version=get_version(),
-    description='Extensions of Django DRF.',
+    description='Boilerplate for Django and Django REST Framework',
     long_description=read('README.rst'),
     long_description_content_type='text/x-rst',
     url='https://github.com/joyongjin/jackal',

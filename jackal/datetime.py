@@ -53,6 +53,19 @@ def local_date(days=0, months=0, years=0, **kwargs):
     return today + relativedelta(days=days, months=months, year=years)
 
 
+def local_tomorrow(today=None, skip_weekend=False):
+    if today is None:
+        today = local_date()
+
+    add_days = 1
+
+    if skip_weekend is True:
+        if today.weekday() >= 4:
+            add_days = 7 - today.weekday()
+
+    return local_date(days=add_days, month=today.month, day=today.day, year=today.year)
+
+
 def local_time(hours=0, minutes=0, seconds=0, **kwargs):
     now = timezone.localtime().replace(**kwargs)
     if now_time_for_test is not None and settings.DEBUG:
