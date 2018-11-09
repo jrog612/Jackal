@@ -5,13 +5,6 @@ from jackal.settings import jackal_settings
 from jackal.shortcuts import model_update
 from jackal.views.base import JackalAPIView
 
-__all__ = [
-    'BaseListCreateGeneric',
-    'BaseDetailUpdateDestroyGeneric',
-    'PaginateListGeneric',
-    'SimpleGeneric',
-]
-
 
 class BaseListCreateGeneric(JackalAPIView):
     serializer_class = None
