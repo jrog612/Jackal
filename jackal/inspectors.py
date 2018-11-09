@@ -12,7 +12,7 @@ class BaseInspector:
 
     {
         'age': {
-            'type_change': int,
+            'type_to': int,
             'if_null': 18,
             'required': true,
             'validator': ValidatorClass,
@@ -24,7 +24,6 @@ class BaseInspector:
     def __init__(self, target_dict, inspect_map):
         self.target = target_dict
         self.map = inspect_map
-        self._inspected_data = target_dict
 
     def get_required_fields(self):
         return [key for key, value in self.map.items() if value.get('required', False)]
@@ -34,8 +33,8 @@ class BaseInspector:
 
     def get_type_change_fields(self):
         return {
-            key: value.get('type_change') for key, value in self.map.items() if
-            value.get('type_change') is not None
+            key: value.get('type_to') for key, value in self.map.items() if
+            value.get('type_to') is not None
         }
 
     def get_validate_fields(self):
@@ -46,15 +45,15 @@ class BaseInspector:
 
     def get_if_null_fields(self):
         return {
-            key: value.get('validator') for key, value in self.map.items() if
-            value.get('validator') is not None
+            key: value.get('if_null') for key, value in self.map.items() if
+            value.get('if_null') is not None
         }
 
     def get_field(self, key, default=None):
         return self.map.get(key, default)
 
     def expected(self, data):
-        fields = self.get_required_fields()
+        fields = self.get_expected_fields()
         expected_dict = {key: value for key, value in data.items() if key in fields}
         return expected_dict
 
@@ -67,12 +66,15 @@ class BaseInspector:
 
     def convert_type(self, data):
         fields = self.get_type_change_fields()
-        ret_dict = {}
-        for key, chn in fields.items():
-            val = data.get(key)
-            if val in none_values:
+        ret_dict = dict()
+
+        for key, value in data.items():
+            if key in fields and value not in none_values:
+                ret_dict[key] = fields[key](value)
                 continue
-            ret_dict[key] = chn(val)
+
+            ret_dict[key] = value
+
         return ret_dict
 
     def check_validate(self, data):
@@ -85,26 +87,30 @@ class BaseInspector:
 
     def convert_if_null(self, data):
         fields = self.get_if_null_fields()
-        ret_data = dict()
-        for key, value in fields.items():
-            v = value
-            if data.get(key) not in none_values:
-                v = data[key]
-            elif v is remove:
-                continue
-            ret_data[key] = v
+        ret_dict = dict()
 
-        return ret_data
+        for key, value in data.items():
+            if key not in fields or value not in none_values:
+                ret_dict[key] = value
+                continue
+
+            if fields[key] is remove:
+                continue
+
+            default = fields[key]
+            ret_dict[key] = default() if callable(default) else default
+
+        return ret_dict
 
     @property
     def inspected_data(self):
-        self._inspected_data = self.expected(self._inspected_data)
-        self.required(self._inspected_data)
-        self._inspected_data = self.convert_type(self._inspected_data)
-        self.check_validate(self._inspected_data)
-        self._inspected_data = self.convert_if_null(self._inspected_data)
-
-        return self._inspected_data
+        ins_data = self.target
+        ins_data = self.expected(ins_data)
+        self.required(ins_data)
+        ins_data = self.convert_type(ins_data)
+        self.check_validate(ins_data)
+        ins_data = self.convert_if_null(ins_data)
+        return ins_data
 
 
 class BaseValidator:
