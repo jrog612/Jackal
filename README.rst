@@ -4,13 +4,16 @@ Jackal
 .. image:: https://badge.fury.io/py/django-jackal.svg
     :target: https://badge.fury.io/py/django-jackal
 
-**Jackal** 은 Django, Django REST framework 를 이용한 웹 백엔드 서버를 손쉽게 구축할 수 있도록 해주는 라이브러리입니다.
+**Jackal** 은 API View 기반 웹 백엔드 서버에서 필요한 기능들을 손쉽게 구현하도록 도와주는 Boilerplate Library 입니다.
+
+**Jackal** 은 Django 및 Django REST Framework(DRF) 를 기반으로 합니다.
 
 **Jackal** 의 특징:
 
-* 모델 아이템의 생성, 조회, 수정, 삭제 및 페이지네이션 등을 아주 손쉽게 구현하게 해줍니다.
-* GET request 의 query parameter 로 온 값들을 통한 손쉬은 필터링.
-* request body 를 다루기 쉽게 검증.
+* 모델 아이템의 생성, 조회, 수정, 삭제 및 페이지네이션 등의 구현을 돕는 API View Generics.
+* GET query parameter 기반의 직관적인 필터링.
+* POST body 값을 모델 친화적으로 검증.
+* API View 확장성 증가
 
 Installation
 ===============
@@ -22,3 +25,10 @@ Installation
 
     pip install django-jackal
 
+
+Document
+============
+
+자세한 사항은 위키_ 참조
+
+.. _위키: https://github.com/joyongjin/jackal/wiki
