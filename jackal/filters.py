@@ -1,28 +1,9 @@
-from django.db.models import Q
-
 from jackal.exceptions import NotFound
 from jackal.loaders import query_function_loader
-from jackal.shortcuts import iterable
+from jackal.shortcuts import gen_q, iterable
 
 
-class RequestFilterMixin:
-    @staticmethod
-    def get_q_object(key, *filter_keywords):
-        q_object = Q()
-        for q in filter_keywords:
-            q_object |= Q(**{q: key})
-        return q_object
-
-    @staticmethod
-    def get_query_function(key):
-        for n, callback in query_function_loader().items():
-            if key.find(n) >= 0:
-                return key.replace(n, ''), callback
-        else:
-            return key, None
-
-
-class JackalQueryFilter(RequestFilterMixin):
+class JackalQueryFilter:
     ordering_key = 'ordering'
     search_keyword_key = 'search_keyword'
     search_type_key = 'search_type'
@@ -32,6 +13,14 @@ class JackalQueryFilter(RequestFilterMixin):
         if params is None:
             params = {}
         self.params = params
+
+    @staticmethod
+    def _get_query_function(key):
+        for n, callback in query_function_loader().items():
+            if key.find(n) >= 0:
+                return key.replace(n, ''), callback
+        else:
+            return key, None
 
     def filter_map(self, filter_map):
         """
@@ -52,7 +41,7 @@ class JackalQueryFilter(RequestFilterMixin):
         filterable = {}
         filterable_q_objects = list()
         for map_key, filter_keyword in filter_map.items():
-            map_key, callback = self.get_query_function(map_key)
+            map_key, callback = self._get_query_function(map_key)
             param_value = self.params.get(map_key)
 
             if param_value in [None, '']:
@@ -61,7 +50,7 @@ class JackalQueryFilter(RequestFilterMixin):
                 param_value = callback(param_value)
 
             if iterable(filter_keyword):
-                filterable_q_objects.append(self.get_q_object(param_value, *filter_keyword))
+                filterable_q_objects.append(gen_q(param_value, *filter_keyword))
             else:
                 filterable[filter_keyword] = param_value
 
@@ -80,7 +69,7 @@ class JackalQueryFilter(RequestFilterMixin):
 
         if dict_value is not None and search_keyword is not None:
             if iterable(dict_value):
-                self.queryset = queryset.filter(self.get_q_object(search_keyword, *dict_value))
+                self.queryset = queryset.filter(gen_q(search_keyword, *dict_value))
             else:
                 self.queryset = queryset.filter(**{dict_value: search_keyword})
         return self

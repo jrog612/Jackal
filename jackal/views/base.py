@@ -2,7 +2,7 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 
 from jackal.filters import JackalQueryFilter
-from jackal.helpers.dict_helper import JackalDictMapper
+from jackal.helpers.data_helper import JackalDictMapper
 from jackal.inspectors import BaseInspector
 from jackal.settings import jackal_settings
 

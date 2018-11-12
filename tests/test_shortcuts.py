@@ -113,4 +113,3 @@ class TestShortcuts(JackalTransactionTestCase):
             self.assertEqual(status_readable(obj2.field_int, 'test'), 'two')
             self.assertEqual(status_readable(obj0.field_int, 'test'), 'zero')
             self.assertEqual(status_readable(4, 'test'), unknown)
-

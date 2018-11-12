@@ -2,6 +2,7 @@ import collections
 
 import six
 from django.apps import apps
+from django.db.models import Q
 
 from jackal.exceptions import NotFound
 from jackal.loaders import structure_loader
@@ -72,3 +73,10 @@ def status_checker(change_to, current, key):
 def status_readable(status, key):
     stru = structure_loader('STATUS_READABLE_CLASSES').get(key, {})
     return stru.get(status, jackal_settings.UNKNOWN_READABLE)
+
+
+def gen_q(key, *filter_keywords):
+    q_object = Q()
+    for q in filter_keywords:
+        q_object |= Q(**{q: key})
+    return q_object
