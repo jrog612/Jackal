@@ -12,7 +12,8 @@ DEFAULTS = {
     ],
     'EXCEPTION_HANDLER': 'jackal.exceptions.jackal_exception_handler',
     'PAGE_LENGTH': None,
-    'APP_DIR': None
+    'APP_DIR': None,
+    'UNKNOWN_READABLE': 'unknown'
 }
 
 IMPORT_STRINGS = [

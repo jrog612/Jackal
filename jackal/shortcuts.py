@@ -5,6 +5,7 @@ from django.apps import apps
 
 from jackal.exceptions import NotFound
 from jackal.loaders import structure_loader
+from jackal.settings import jackal_settings
 
 
 def iterable(arg):
@@ -12,8 +13,7 @@ def iterable(arg):
 
 
 def get_object_or_None(model, **fields):
-    items = model.objects.filter(**fields)
-    return items.first() if items.exists() else None
+    return model.objects.filter(**fields).first()
 
 
 def get_object_or_404(model, **fields):
@@ -69,9 +69,6 @@ def status_checker(change_to, current, key):
     return True
 
 
-def readable_status(key, status):
-    stru = structure_loader('STATUS_READABLE_CLASSES').get(key)
-    if stru is None:
-        return '알 수 없음'
-
-    return stru.get(status, '알 수 없음')
+def status_readable(status, key):
+    stru = structure_loader('STATUS_READABLE_CLASSES').get(key, {})
+    return stru.get(status, jackal_settings.UNKNOWN_READABLE)
