@@ -1,5 +1,5 @@
 Jackal, the Boilerplate library for Django REST Framework
----------------
+-------------------------------------------------------------
 
 .. image:: https://badge.fury.io/py/django-jackal.svg
     :target: https://badge.fury.io/py/django-jackal
@@ -9,9 +9,7 @@ Jackal, the Boilerplate library for Django REST Framework
     :align: center
 
 
-**Jackal** 은 API View 기반 웹 백엔드 서버에서 필요한 기능들을 손쉽게 구현하도록 도와주는 Boilerplate Library 입니다.
-
-**Jackal** 은 Django 및 Django REST Framework(DRF) 를 기반으로 합니다.
+**Jackal** 은 웹 백엔드 서버에서 필요한 기능들을 손쉽게 구현하도록 도와주는 Django 및 Django REST Framework(DRF) 기반 Boilerplate Library 입니다.
 
 **Jackal** 의 특징:
 
