@@ -70,18 +70,6 @@ class _Getter:
     def get_cur_inspect_map(self):
         return getattr(self, '{}_inspect_map'.format(self.request.method), self.inspect_map)
 
-    def get_inspected_data(self, request):
-        inspector = self.get_inspector(request)
-        if inspector is not None:
-            request.is_inspected = True
-            return inspector.inspected_data
-        else:
-            request.is_inspected = False
-            if hasattr(request.data, 'dict'):
-                return request.data.dict()
-            else:
-                return request.data
-
     def get_user_field(self):
         return self.user_field
 
@@ -218,12 +206,27 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
         queryset = f.filter_map(filter_map).extra(**extra_kwargs).queryset
         return queryset
 
-    def get_user_queryset(self, queryset, request):
+    def get_user_queryset(self, request, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+
         user_field = self.get_user_field()
         if user_field:
             queryset = queryset.filter(**{user_field: request.user})
 
         return queryset
+
+    def get_inspected_data(self, request):
+        inspector = self.get_inspector(request)
+        if inspector is not None:
+            request.is_inspected = True
+            return inspector.inspected_data
+        else:
+            request.is_inspected = False
+            if hasattr(request.data, 'dict'):
+                return request.data.dict()
+            else:
+                return request.data
 
 
 class JackalAPIView(JackalBaseAPIView):
