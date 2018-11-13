@@ -17,4 +17,5 @@ def query_function_loader():
     for cls in jackal_settings.QUERY_FUNCTION_CLASSES:
         if isinstance(cls, BaseQueryFunction):
             ret_data.update(cls.get_function_set())
+
     return ret_data

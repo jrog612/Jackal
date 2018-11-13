@@ -5,10 +5,6 @@ from jackal.shortcuts import gen_q
 
 
 class JackalQueryFilter:
-    ordering_key = 'ordering'
-    search_keyword_key = 'search_keyword'
-    search_type_key = 'search_type'
-
     def __init__(self, queryset, params=None):
         self.queryset = queryset
         if params is None:
@@ -58,13 +54,11 @@ class JackalQueryFilter:
         self.queryset = queryset.filter(*filterable_q_objects, **filterable).distinct()
         return self
 
-    def search(self, search_dict):
-        """
-        """
+    def search(self, search_dict, search_keyword_key='search_keyword', search_type_key='search_type'):
         queryset = self.queryset
 
-        search_keyword = self.params.get(self.search_keyword_key)
-        search_type = self.params.get(self.search_type_key, 'all')
+        search_keyword = self.params.get(search_keyword_key)
+        search_type = self.params.get(search_type_key, 'all')
 
         dict_value = search_dict.get(search_type, None)
 
@@ -82,10 +76,10 @@ class JackalQueryFilter:
         self.queryset = queryset.filter(**extra_kwargs)
         return self
 
-    def ordering(self):
+    def ordering(self, ordering_key='ordering'):
         """
         """
-        ordering = self.params.get(self.ordering_key)
+        ordering = self.params.get(ordering_key)
         if ordering:
             queryset = self.queryset
             order_by = ordering.split(',')
