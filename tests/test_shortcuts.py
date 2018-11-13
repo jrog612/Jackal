@@ -1,8 +1,9 @@
 from django.test import override_settings
 
 from jackal.exceptions import NotFound
+from jackal.helpers.data_helper import isiter
 from jackal.settings import jackal_settings
-from jackal.shortcuts import get_object_or_404, get_object_or_None, iterable, model_update, operating, status_checker, \
+from jackal.shortcuts import get_object_or_404, get_object_or_None, model_update, operating, status_checker, \
     status_readable
 from jackal.structures import BaseStatusCondition, BaseStatusReadable
 from jackal.tests import JackalTransactionTestCase
@@ -39,16 +40,16 @@ class TestReadable(BaseStatusReadable):
 
 class TestShortcuts(JackalTransactionTestCase):
     def test_iterable(self):
-        self.assertTrue(iterable([1, 2, 3]))
-        self.assertTrue(iterable((1, 2, 3)))
-        self.assertTrue(iterable({1, 2, 3}))
-        self.assertTrue(iterable({1: 1, 2: 2, 3: 3}))
+        self.assertTrue(isiter([1, 2, 3]))
+        self.assertTrue(isiter((1, 2, 3)))
+        self.assertTrue(isiter({1, 2, 3}))
+        self.assertTrue(isiter({1: 1, 2: 2, 3: 3}))
 
-        self.assertFalse(iterable('String Sentence'))
-        self.assertFalse(iterable(None))
-        self.assertFalse(iterable(False))
-        self.assertFalse(iterable(True))
-        self.assertFalse(iterable(123))
+        self.assertFalse(isiter('String Sentence'))
+        self.assertFalse(isiter(None))
+        self.assertFalse(isiter(False))
+        self.assertFalse(isiter(True))
+        self.assertFalse(isiter(123))
 
     def test_get_object_or(self):
         obj = TestModel.objects.create(field_int=1)

@@ -1,6 +1,7 @@
 from jackal.exceptions import NotFound
+from jackal.helpers.data_helper import isiter
 from jackal.loaders import query_function_loader
-from jackal.shortcuts import gen_q, iterable
+from jackal.shortcuts import gen_q
 
 
 class JackalQueryFilter:
@@ -49,7 +50,7 @@ class JackalQueryFilter:
             elif callback is not None:
                 param_value = callback(param_value)
 
-            if iterable(filter_keyword):
+            if isiter(filter_keyword):
                 filterable_q_objects.append(gen_q(param_value, *filter_keyword))
             else:
                 filterable[filter_keyword] = param_value
@@ -68,7 +69,7 @@ class JackalQueryFilter:
         dict_value = search_dict.get(search_type, None)
 
         if dict_value is not None and search_keyword is not None:
-            if iterable(dict_value):
+            if isiter(dict_value):
                 self.queryset = queryset.filter(gen_q(search_keyword, *dict_value))
             else:
                 self.queryset = queryset.filter(**{dict_value: search_keyword})

@@ -9,10 +9,6 @@ from jackal.loaders import structure_loader
 from jackal.settings import jackal_settings
 
 
-def iterable(arg):
-    return isinstance(arg, collections.Iterable) and not isinstance(arg, six.string_types)
-
-
 def get_object_or_None(model, **fields):
     return model.objects.filter(**fields).first()
 
