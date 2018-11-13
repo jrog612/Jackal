@@ -1,4 +1,4 @@
-Jackal
+Jackal, the Boilerplate library for Django REST Framework
 ---------------
 
 .. image:: https://badge.fury.io/py/django-jackal.svg
