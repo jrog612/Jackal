@@ -13,7 +13,7 @@ Jackal, the Boilerplate library for Django REST Framework
 
 **Jackal** 의 특징:
 
-* 모델 아이템의 생성, 조회, 수정, 삭제 및 페이지네이션 등의 구현을 돕는 API View Generics.
+* 모델 아이템의 생성, 조회, 수정, 삭제 및 페이지네이션 등의 구현을 돕는 Generic API Views.
 * GET query parameter 기반의 직관적인 필터링.
 * POST body 값을 모델 친화적으로 검증.
 * API View 확장성 증가
