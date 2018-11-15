@@ -1,5 +1,5 @@
 from jackal.tests import JackalTestCase
 
 
-class TestLoader(JackalTestCase):
+class TestPaginator(JackalTestCase):
     pass

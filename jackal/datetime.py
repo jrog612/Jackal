@@ -50,7 +50,7 @@ def local_date(days=0, months=0, years=0, **kwargs):
         )
 
     today = today.replace(**kwargs)
-    return today + relativedelta(days=days, months=months, year=years)
+    return today + relativedelta(days=days, months=months, years=years)
 
 
 def local_tomorrow(today=None, skip_weekend=False):

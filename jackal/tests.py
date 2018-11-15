@@ -1,8 +1,12 @@
-from django.test import TransactionTestCase
+import random
+
+from django.test import TransactionTestCase, TestCase
 from rest_framework.test import APITestCase
 
 
 class _TestMixin:
+    rd = random
+
     def assertLen(self, length, seq):
         assert length == len(seq)
 
@@ -21,4 +25,8 @@ class JackalAPITestCase(APITestCase, _TestMixin):
 
 
 class JackalTransactionTestCase(TransactionTestCase, _TestMixin):
+    pass
+
+
+class JackalTestCase(TestCase, _TestMixin):
     pass
