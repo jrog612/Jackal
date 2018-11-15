@@ -66,12 +66,15 @@ def local_tomorrow(today=None, skip_weekend=False):
     return local_date(days=add_days, month=today.month, day=today.day, year=today.year)
 
 
-def local_time(hours=0, minutes=0, seconds=0, **kwargs):
+def local_time(hours=0, minutes=0, seconds=0, microseconds=0, to_time=False, **kwargs):
     now = timezone.localtime().replace(**kwargs)
     if now_time_for_test is not None and settings.DEBUG:
         now = now_time_for_test
 
-    return now + timedelta(minutes=minutes, hours=hours, seconds=seconds)
+    now += timedelta(minutes=minutes, hours=hours, seconds=seconds, microseconds=microseconds)
+    if to_time:
+        return now.time()
+    return now
 
 
 def date_range(start, end):

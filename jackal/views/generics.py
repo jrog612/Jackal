@@ -6,80 +6,50 @@ from jackal.shortcuts import model_update
 from jackal.views.base import JackalAPIView
 
 
-class BaseListCreateGeneric(JackalAPIView):
-    serializer_class = None
-    list_mixin = None
-    create_mixin = None
-
+class ListCreateGeneric(JackalAPIView):
     def list(self, request, **kwargs):
-        if self.list_mixin is None:
-            serializer_class = self.get_serializer_class()
-            filtered_queryset = self.get_filtered_queryset(request, **kwargs)
-            ser = serializer_class(instance=filtered_queryset, many=True)
-            return self.simple_response(ser.data)
-        else:
-            return self.simple_response(self.list_mixin(request, **kwargs))
+        serializer_class = self.get_serializer_class()
+        filtered_queryset = self.get_filtered_queryset(request, **kwargs)
+        ser = serializer_class(instance=filtered_queryset, many=True)
+        return self.simple_response(ser.data)
 
     def create(self, request, **kwargs):
-        if self.create_mixin is None:
-            model = self.get_model()
-            obj = model.objects.create(**request.inspected_data)
-            return self.success(id=obj.id)
-        else:
-            result = self.create_mixin(request, **kwargs)
-            if result is True or result is None:
-                return self.success()
-            else:
-                return self.simple_response(result)
+        model = self.get_model()
+        obj = model.objects.create(**request.inspected_data)
+        return self.success(id=obj.id)
 
 
-class BaseDetailUpdateDestroyGeneric(JackalAPIView):
-    update_mixin = None
-    detail_mixin = None
-    destroy_mixin = None
-
+class DetailUpdateDestroyGeneric(JackalAPIView):
     def detail(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
-        if self.detail_mixin is None:
-            ser = self.serializer_class(obj)
-            return self.simple_response(ser.data)
-        else:
-            data = self.detail_mixin(obj)
-            return self.simple_response(data)
+        ser = self.serializer_class(obj)
+        return self.simple_response(ser.data)
 
     def update(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
-        if self.update_mixin is None:
-            model_update(obj, **request.inspected_data)
-            return self.success(id=obj.id)
-
-        else:
-            result = self.update_mixin(request, obj)
-            return self.simple_response(result)
+        model_update(obj, **request.inspected_data)
+        return self.success(id=obj.id)
 
     def destroy(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
-        if self.destroy_mixin is None:
-            obj.delete()
-            return self.success()
-        else:
-            result = self.destroy_mixin(request, obj)
-            return self.simple_response(result)
+        obj.delete()
+        return self.success()
 
 
 class PaginateListGeneric(JackalAPIView):
-    default_page = 1
-    default_limit = None
+    default_page_number = 1
+    default_page_length = None
+    page_number_key = 'page_num'
+    page_length_key = 'page_length'
 
     def paginated_list(self, request, **kwargs):
         queryset = self.get_filtered_queryset(request, **kwargs)
         return self.paginated_data(request, queryset)
 
     def paginated_data(self, request, queryset):
-        if self.default_limit is None:
-            self.default_limit = jackal_settings.PAGE_LENGTH
-
-        paginator = JackalPaginator(queryset, request, self.default_page, self.default_limit)
+        page_num = request.query_params.get(self.page_number_key, self.default_page_number)
+        page_length = request.query_params.get(self.page_number_key, self.default_page_length)
+        paginator = JackalPaginator(queryset, request, page_num, page_length)
         response_data = paginator.serialized_data(
             self.get_serializer_class(), self.get_serializer_context()
         )
@@ -113,60 +83,44 @@ class LabelValueListGeneric(JackalAPIView):
             value = serializers.CharField(source=self.value_field)
 
             class Meta:
-                model = self.model
+                model = self.get_model()
                 fields = ('label', 'value')
 
         return LabelValueSerializer
 
-    def get(self, request, **kwargs):
+    def label_value_list(self, request, **kwargs):
         queryset = self.get_filtered_queryset(request, **kwargs)
         ser_class = self.get_serializer_class()
         return self.simple_response(ser_class(queryset, many=True))
 
 
-class DetailMixin(BaseDetailUpdateDestroyGeneric):
+class DetailMixin(DetailUpdateDestroyGeneric):
     def get(self, request, **kwargs):
         return self.detail(request, **kwargs)
 
 
-class DestroyMixin(BaseDetailUpdateDestroyGeneric):
+class DestroyMixin(DetailUpdateDestroyGeneric):
     def delete(self, request, **kwargs):
         return self.destroy(request, **kwargs)
 
 
-class UpdateMixin(BaseDetailUpdateDestroyGeneric):
+class UpdateMixin(DetailUpdateDestroyGeneric):
     def patch(self, request, **kwargs):
         return self.update(request, **kwargs)
 
 
-class DetailUpdateMixin(BaseDetailUpdateDestroyGeneric):
-    def get(self, request, **kwargs):
-        return self.detail(request, **kwargs)
-
-    def patch(self, request, **kwargs):
-        return self.update(request, **kwargs)
-
-
-class DetailUpdateDestroyMixin(BaseDetailUpdateDestroyGeneric):
+class DetailUpdateMixin(DetailUpdateDestroyGeneric):
     def get(self, request, **kwargs):
         return self.detail(request, **kwargs)
 
     def patch(self, request, **kwargs):
         return self.update(request, **kwargs)
 
-    def delete(self, request, **kwargs):
-        return self.destroy(request, **kwargs)
 
-
-class DetailDestroyMixin(BaseDetailUpdateDestroyGeneric):
+class DetailUpdateDestroyMixin(DetailUpdateDestroyGeneric):
     def get(self, request, **kwargs):
         return self.detail(request, **kwargs)
 
-    def delete(self, request, **kwargs):
-        return self.destroy(request, **kwargs)
-
-
-class UpdateDestroyMixin(BaseDetailUpdateDestroyGeneric):
     def patch(self, request, **kwargs):
         return self.update(request, **kwargs)
 
@@ -174,17 +128,33 @@ class UpdateDestroyMixin(BaseDetailUpdateDestroyGeneric):
         return self.destroy(request, **kwargs)
 
 
-class ListMixin(BaseListCreateGeneric):
+class DetailDestroyMixin(DetailUpdateDestroyGeneric):
+    def get(self, request, **kwargs):
+        return self.detail(request, **kwargs)
+
+    def delete(self, request, **kwargs):
+        return self.destroy(request, **kwargs)
+
+
+class UpdateDestroyMixin(DetailUpdateDestroyGeneric):
+    def patch(self, request, **kwargs):
+        return self.update(request, **kwargs)
+
+    def delete(self, request, **kwargs):
+        return self.destroy(request, **kwargs)
+
+
+class ListMixin(ListCreateGeneric):
     def get(self, request, **kwargs):
         return self.list(request, **kwargs)
 
 
-class CreateMixin(BaseListCreateGeneric):
+class CreateMixin(ListCreateGeneric):
     def post(self, request, **kwargs):
         return self.create(request, **kwargs)
 
 
-class ListCreateMixin(BaseListCreateGeneric):
+class ListCreateMixin(ListCreateGeneric):
     def get(self, request, **kwargs):
         return self.list(request, **kwargs)
 
@@ -223,4 +193,5 @@ class DeleteMixin(SimpleGeneric):
 
 
 class LabelValueListMixin(LabelValueListGeneric):
-    pass
+    def get(self, request, **kwargs):
+        return self.label_value_list(request, **kwargs)

@@ -4,18 +4,13 @@ from jackal.settings import jackal_settings
 
 
 class JackalPaginator:
-    def __init__(self, queryset, request, default_page=1, default_limit=None):
-        if default_limit is None:
-            default_limit = jackal_settings.PAGE_LENGTH if jackal_settings.PAGE_LENGTH else 10
+    def __init__(self, queryset, request, page_number, page_length):
+        if page_length is None:
+            page_length = jackal_settings.PAGE_LENGTH if jackal_settings.PAGE_LENGTH else 10
 
-        page = request.query_params.get('page_number', default_page)
-        if int(page) <= 0:
-            page = 1
-        limit = request.query_params.get('page_length', default_limit)
-
-        self.paginator = Paginator(queryset, limit)
-        self.page_number = int(page)
-        self.page_length = int(limit)
+        self.paginator = Paginator(queryset, page_length)
+        self.page_number = int(page_number)
+        self.page_length = int(page_length)
 
     def response_data(self):
         return {
