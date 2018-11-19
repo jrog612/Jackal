@@ -16,6 +16,9 @@ class _HttpMethodPermission(permissions.BasePermission):
             return True
         return request.method == self.allow_method
 
+    def has_object_permission(self, request, view, obj):
+        return self.has_permission(request, view)
+
 
 class IsGet(_HttpMethodPermission):
     """
