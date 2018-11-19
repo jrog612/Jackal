@@ -16,12 +16,9 @@ class JackalAPIException(APIException):
 class MessageException(JackalAPIException):
     default_message = ''
 
-    def __init__(self, message=None, extra_data=None, **kwargs):
-        if message is None:
-            self.message = self.default_message
-        else:
-            self.message = message
-        self.extra_data = extra_data
+    def __init__(self, message=None, context=None, **kwargs):
+        self.message = message if message is not None else self.default_message
+        self.context = context if context is not None else dict()
         self.kwargs = kwargs
 
     def response_data(self):
@@ -66,7 +63,7 @@ class FieldException(JackalAPIException):
         self.field = field
         self.message = message
         self.kwargs = kwargs
-        self.context = context
+        self.context = context if context is not None else dict()
 
     def response_data(self):
         return {
@@ -78,15 +75,6 @@ class FieldException(JackalAPIException):
 
 class StructureException(MessageException):
     status_code = 500
-
-
-class ConvertError(BaseException):
-    def __init__(self, message, value, field_class, field_ins, default_value=None):
-        self.message = message
-        self.value = value
-        self.field_class = field_class
-        self.field_ins = field_ins
-        self.default_value = default_value
 
 
 def jackal_exception_handler(exc, context):

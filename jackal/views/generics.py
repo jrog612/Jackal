@@ -1,7 +1,6 @@
 from rest_framework import serializers
 
 from jackal.paginators import JackalPaginator
-from jackal.settings import jackal_settings
 from jackal.shortcuts import model_update
 from jackal.views.base import JackalAPIView
 
