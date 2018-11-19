@@ -53,3 +53,11 @@ class IsDelete(_HttpMethodPermission):
     DELETE 요청을 체크합니다.
     """
     allow_method = DELETE
+
+
+class HasAuth(permissions.IsAuthenticated):
+    pass
+
+
+class HasAuthOrReadOnly(permissions.IsAuthenticatedOrReadOnly):
+    pass
