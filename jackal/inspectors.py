@@ -89,7 +89,7 @@ class Inspector(_Getter):
         for key, validator in fields.items():
             v = validator(value=data.get(key), field_name=key, total_data=data, inspector=self)
             if not v.is_valid():
-                raise FieldException(field=key, message='Invalid Value', context={'value': data.get(key)})
+                raise FieldException(field=key, message=v.invalid_message, context={'value': data.get(key)})
         return True
 
     def convert_if_null(self, data):
@@ -126,11 +126,13 @@ class BaseValidator:
     """
     You can customize this validator. Please override is_valid function.
     """
+    default_invalid_message = 'Invalid Value'
 
     def __init__(self, value, field_name, **kwargs):
         self.value = value
         self.field_name = field_name
         self.kwargs = kwargs
+        self.invalid_message = self.default_invalid_message
 
     def is_valid(self):
         return True

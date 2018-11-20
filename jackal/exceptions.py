@@ -37,7 +37,7 @@ class NotFound(MessageException):
     @property
     def message(self):
         filter_condition = ', '.join(['{}={}'.format(key, value) for key, value in self.filters.items()])
-        return 'can not find {} model about \'{}\' condition'.format(self.model.__name__, filter_condition)
+        return 'Can not find {} model instance filtered by \'{}\''.format(self.model.__name__, filter_condition)
 
     def response_data(self):
         return {'message': self.message, 'model': self.model.__name__, **self.kwargs}
@@ -71,10 +71,6 @@ class FieldException(JackalAPIException):
             'field': self.field,
             **self.kwargs
         }
-
-
-class StructureException(MessageException):
-    status_code = 500
 
 
 def jackal_exception_handler(exc, context):
