@@ -4,9 +4,9 @@ from jackal.settings import jackal_settings
 
 
 class JackalPaginator:
-    def __init__(self, queryset, request, page_number, page_length):
+    def __init__(self, queryset, page_number, page_length):
         if page_length is None:
-            page_length = jackal_settings.PAGE_LENGTH if jackal_settings.PAGE_LENGTH else 10
+            page_length = jackal_settings.PAGE_LENGTH
 
         self.paginator = Paginator(queryset, page_length)
         self.page_number = int(page_number)

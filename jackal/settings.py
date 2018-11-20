@@ -10,12 +10,13 @@ DEFAULTS = {
     'QUERY_FUNCTION_CLASSES': [
         'jackal.structures.DefaultQueryFunction',
     ],
+    'CUSTOM_STRUCTURES': {},
+
     'EXCEPTION_HANDLER': 'jackal.exceptions.jackal_exception_handler',
-    'PAGE_LENGTH': None,
+    'PAGE_LENGTH': 10,
     'APP_DIR': None,
     'UNKNOWN_READABLE': 'unknown',
     'DEFAULT_NONE_VALUES': ([], {}, '', None),
-    'CUSTOM_STRUCTURES': {},
 }
 
 IMPORT_STRINGS = [

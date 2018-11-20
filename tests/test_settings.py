@@ -14,9 +14,9 @@ class TestSettings(TestCase):
             print(settings.STATUS_CONDITION_CLASSES)
 
     def test_override_settings(self):
-        assert jackal_settings.PAGE_LENGTH is None
+        assert jackal_settings.PAGE_LENGTH is 10
 
-        with override_settings(JACKAL={'PAGE_LENGTH': 10}):
-            assert jackal_settings.PAGE_LENGTH == 10
+        with override_settings(JACKAL={'PAGE_LENGTH': 20}):
+            assert jackal_settings.PAGE_LENGTH == 20
 
-        assert jackal_settings.PAGE_LENGTH is None
+        assert jackal_settings.PAGE_LENGTH is 10
