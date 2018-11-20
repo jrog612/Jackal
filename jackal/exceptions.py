@@ -51,11 +51,6 @@ class BadRequest(MessageException):
     status_code = 400
 
 
-class AlreadyExist(MessageException):
-    default_message = 'data already exists'
-    status_code = 400
-
-
 class FieldException(JackalAPIException):
     status_code = 400
 
