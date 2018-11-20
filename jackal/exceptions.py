@@ -4,7 +4,7 @@ from rest_framework.response import Response
 
 class JackalAPIException(APIException):
     default_message = ''
-    status_code = ''
+    status_code = None
 
     def __str__(self):
         return self.__class__.__name__
@@ -27,6 +27,7 @@ class MessageException(JackalAPIException):
 
 class NotFound(MessageException):
     status_code = 404
+    message_form = 'Can not find {} model instance filtered by \'{}\''
 
     def __init__(self, model, filters, context=None, **kwargs):
         self.model = model
@@ -37,7 +38,7 @@ class NotFound(MessageException):
     @property
     def message(self):
         filter_condition = ', '.join(['{}={}'.format(key, value) for key, value in self.filters.items()])
-        return 'Can not find {} model instance filtered by \'{}\''.format(self.model.__name__, filter_condition)
+        return self.message_form.format(self.model.__name__, filter_condition)
 
     def response_data(self):
         return {'message': self.message, 'model': self.model.__name__, **self.kwargs}
