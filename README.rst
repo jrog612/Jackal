@@ -35,3 +35,10 @@ Document
 자세한 사항은 위키_ 참조
 
 .. _위키: https://github.com/joyongjin/jackal/wiki
+
+Test
+============
+
+.. code::
+
+    python runtests.py tests
