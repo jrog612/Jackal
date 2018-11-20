@@ -1,7 +1,7 @@
 from django.test import TestCase
 
 from jackal.exceptions import FieldException
-from jackal.inspectors import BaseInspector, remove
+from jackal.inspectors import Inspector, remove
 
 
 class TestInspector(TestCase):
@@ -26,7 +26,7 @@ class TestInspector(TestCase):
             'b': {},
             'd': {}
         }
-        ins = BaseInspector(pre_inspect, inspect_map)
+        ins = Inspector(pre_inspect, inspect_map)
         result = ins.inspected_data
 
         self.assertEqual({'a': 'a', 'b': 'a', 'd': 'a'}, result)
@@ -44,13 +44,13 @@ class TestInspector(TestCase):
         }
 
         with self.assertRaises(FieldException) as res:
-            ins = BaseInspector(pre_inspect, inspect_map)
+            ins = Inspector(pre_inspect, inspect_map)
             ins.inspected_data
         self.assertEqual('b', res.exception.field)
 
         pre_inspect.update({'b': 'a'})
 
-        ins = BaseInspector(pre_inspect, inspect_map)
+        ins = Inspector(pre_inspect, inspect_map)
         result = ins.inspected_data
         self.assertEqual({'a': 'a', 'b': 'a', 'd': 'a'}, result)
 
@@ -64,7 +64,7 @@ class TestInspector(TestCase):
             'b': {'type_to': int},
         }
 
-        ins = BaseInspector(pre_inspect, inspect_map)
+        ins = Inspector(pre_inspect, inspect_map)
         result = ins.inspected_data
         self.assertEqual({'a': '121', 'b': 1234}, result)
 
@@ -83,7 +83,7 @@ class TestInspector(TestCase):
 
         }
 
-        ins = BaseInspector(pre_inspect, inspect_map)
+        ins = Inspector(pre_inspect, inspect_map)
         result = ins.inspected_data
         self.assertEqual({
             'b': None, 'c': 'default', 'd': 100

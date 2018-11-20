@@ -3,7 +3,7 @@ from rest_framework.views import APIView
 
 from jackal.filters import JackalQueryFilter
 from jackal.helpers.data_helper import JackalDictMapper
-from jackal.inspectors import BaseInspector
+from jackal.inspectors import Inspector
 from jackal.settings import jackal_settings
 
 
@@ -130,7 +130,7 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
 
     serializer_class = None
     query_filter = JackalQueryFilter
-    inspector_class = BaseInspector
+    inspector_class = Inspector
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)

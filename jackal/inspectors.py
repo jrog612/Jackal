@@ -1,5 +1,5 @@
-from jackal.consts import none_values
 from jackal.exceptions import FieldException
+from jackal.settings import jackal_settings
 
 
 class remove:
@@ -34,8 +34,13 @@ class _Getter:
     def get_field(self, key, default=None):
         return self.map.get(key, default)
 
+    def get_none_values(self):
+        return self.none_values if self.none_values is not None else jackal_settings.DEFAULT_NONE_VALUES
 
-class BaseInspector(_Getter):
+
+class Inspector(_Getter):
+    none_values = None
+
     """
     example of inspector map
 
@@ -62,7 +67,7 @@ class BaseInspector(_Getter):
     def required(self, data):
         fields = self.get_required_fields()
         for req in fields:
-            if data.get(req) in none_values:
+            if data.get(req) in self.get_none_values():
                 raise FieldException(field=req, message='Required')
         return True
 
@@ -71,7 +76,7 @@ class BaseInspector(_Getter):
         ret_dict = dict()
 
         for key, value in data.items():
-            if key in fields and value not in none_values:
+            if key in fields and value not in self.get_none_values():
                 ret_dict[key] = fields[key](value)
                 continue
 
@@ -92,7 +97,7 @@ class BaseInspector(_Getter):
         ret_dict = dict()
 
         for key, value in data.items():
-            if key not in fields or value not in none_values:
+            if key not in fields or value not in self.get_none_values():
                 ret_dict[key] = value
                 continue
 
