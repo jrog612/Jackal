@@ -4,17 +4,14 @@ from jackal.settings import jackal_settings
 
 
 class JackalPaginator:
-    def __init__(self, queryset, page_number, page_length):
-        if page_length is None:
-            page_length = jackal_settings.PAGE_LENGTH
-
-        self.paginator = Paginator(queryset, page_length)
-        self.page_number = int(page_number)
-        self.page_length = int(page_length)
+    def __init__(self, queryset, page_number=None, page_length=None):
+        self.page_number = int(page_number) if page_number is not None else 1
+        self.page_length = int(page_length) if page_length is not None else jackal_settings.PAGE_LENGTH
+        self.paginator = Paginator(queryset, self.page_length)
 
     def response_data(self):
         return {
-            'cur_page': self.page_number,
+            'current_page': self.page_number,
             'total_page': self.paginator.num_pages,
             'page_length': self.page_length,
             'count': self.paginator.count,
@@ -24,7 +21,7 @@ class JackalPaginator:
     def serialized_data(self, serializer_class, context=None):
         ser = serializer_class(self.page_object(), many=True, context=context)
         return {
-            'cur_page': self.page_number,
+            'current_page': self.page_number,
             'total_page': self.paginator.num_pages,
             'page_length': self.page_length,
             'count': self.paginator.count,
