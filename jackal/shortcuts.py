@@ -1,6 +1,3 @@
-import collections
-
-import six
 from django.apps import apps
 from django.db.models import Q
 
@@ -28,8 +25,8 @@ def model_update(instance, **fields):
     return instance
 
 
-def get_model(model_name):
-    return apps.get_model(model_name)
+def get_model(*args, **kwargs):
+    return apps.get_model(*args, **kwargs)
 
 
 def operating(a, oper, b):
