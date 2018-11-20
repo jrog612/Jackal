@@ -4,7 +4,15 @@ from jackal.structures import JackalBaseStructure, BaseQueryFunction
 
 def structure_loader(key):
     ret_data = dict()
-    for cls in getattr(jackal_settings, key):
+    stru = getattr(jackal_settings, key, None)
+
+    if stru is None:
+        stru = getattr(jackal_settings.CUSTOM_STRUCTURES, key, None)
+
+        if stru is None:
+            return {}
+
+    for cls in stru:
         if issubclass(cls, JackalBaseStructure):
             ret_data.update(cls.get_structure())
         else:

@@ -14,7 +14,8 @@ DEFAULTS = {
     'PAGE_LENGTH': None,
     'APP_DIR': None,
     'UNKNOWN_READABLE': 'unknown',
-    'DEFAULT_NONE_VALUES': ([], {}, '', None)
+    'DEFAULT_NONE_VALUES': ([], {}, '', None),
+    'CUSTOM_STRUCTURES': {},
 }
 
 IMPORT_STRINGS = [
