@@ -1,8 +1,8 @@
 from importlib import import_module
 
-from django.utils import six
 from django.conf import settings
 from django.test.signals import setting_changed
+from django.utils import six
 
 DEFAULTS = {
     'STATUS_CONDITION_CLASSES': [],
@@ -23,6 +23,7 @@ IMPORT_STRINGS = [
     'STATUS_READABLE_CLASSES',
     'QUERY_FUNCTION_CLASSES',
     'EXCEPTION_HANDLER',
+    'CUSTOM_STRUCTURES',
 ]
 
 
@@ -76,6 +77,9 @@ def perform_import(val, setting_name):
         return import_from_string(val, setting_name)
     elif isinstance(val, (list, tuple)):
         return [import_from_string(item, setting_name) for item in val]
+    elif isinstance(val, dict):
+        return {key: perform_import(item, setting_name) for key, item in val.items()}
+
     return val
 
 

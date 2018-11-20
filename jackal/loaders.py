@@ -7,7 +7,7 @@ def structure_loader(key):
     stru = getattr(jackal_settings, key, None)
 
     if stru is None:
-        stru = getattr(jackal_settings.CUSTOM_STRUCTURES, key, None)
+        stru = jackal_settings.CUSTOM_STRUCTURES.get(key)
 
         if stru is None:
             return {}
