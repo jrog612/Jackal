@@ -7,7 +7,7 @@ class TestStructure(TestCase):
     def test_structure_import_in_settings(self):
         settings = JackalSettings({
             'STATUS_CONDITION_CLASSES': [
-                'tests.test_structures.MyTestStructure'
+                'tests.structures.MyTestStructure'
             ]
         })
 
