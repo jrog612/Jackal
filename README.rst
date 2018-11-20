@@ -21,9 +21,6 @@ Jackal, the Boilerplate library for Django REST Framework
 Installation
 ===============
 
-현재 베타 배포 상태. 라이브러리의 완전한 검증이 이루어지지 않았기에, 버그가 다수 발생 가능성이 높습니다.
-
-
 .. code::
 
     pip install django-jackal
