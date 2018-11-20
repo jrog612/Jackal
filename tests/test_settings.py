@@ -1,6 +1,7 @@
 from django.test import TestCase, override_settings
 
 from jackal.settings import JackalSettings, jackal_settings
+from jackal.structures import DefaultQueryFunction
 
 
 class TestSettings(TestCase):
@@ -20,3 +21,7 @@ class TestSettings(TestCase):
             assert jackal_settings.PAGE_LENGTH == 20
 
         assert jackal_settings.PAGE_LENGTH is 10
+
+    def test_str_import(self):
+        dq = jackal_settings.QUERY_FUNCTION_CLASSES[0]
+        assert dq is DefaultQueryFunction

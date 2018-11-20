@@ -39,7 +39,7 @@ class BaseQueryFunction:
 
         for name, func in cls.__dict__.items():
             if name.find('{}_'.format(cls.prefix)) == 0:
-                name = name.replace('{}_'.format(cls.prefix))
+                name = name.replace('{}_'.format(cls.prefix), '')
                 ret_dict[name] = func
         return ret_dict
 

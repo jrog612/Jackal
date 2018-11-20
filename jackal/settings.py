@@ -4,11 +4,13 @@ from django.conf import settings
 from django.test.signals import setting_changed
 from django.utils import six
 
+DEFAULT_QUERY_FUNCTION = 'jackal.structures.DefaultQueryFunction'
+
 DEFAULTS = {
     'STATUS_CONDITION_CLASSES': [],
     'STATUS_READABLE_CLASSES': [],
     'QUERY_FUNCTION_CLASSES': [
-        'jackal.structures.DefaultQueryFunction',
+        DEFAULT_QUERY_FUNCTION
     ],
     'CUSTOM_STRUCTURES': {},
 
