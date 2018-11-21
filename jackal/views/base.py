@@ -87,18 +87,6 @@ class _PrePost:
         """
         pass
 
-    def pre_dispatch(self, request, *args, **kwargs):
-        """
-        This will call before dispatch. before permission check, before authenticate, before initial request...
-        """
-        pass
-
-    def post_dispatch(self, request, response, *args, **kwargs):
-        """
-        This will call after dispatch. after all api view logic. So it receive response to argument.
-        """
-        pass
-
     def pre_check_permissions(self, request):
         pass
 
@@ -139,9 +127,33 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
 
     def dispatch(self, request, *args, **kwargs):
         self.pre_dispatch(request, *args, **kwargs)
-        response = super().dispatch(request, *args, **kwargs)
+
+        self.args = args
+        self.kwargs = kwargs
+        request = self.initialize_request(request, *args, **kwargs)
+        self.request = request
+        self.headers = self.default_response_headers  # deprecate?
+
+        try:
+            self.initial(request, *args, **kwargs)
+
+            # Get the appropriate handler method
+            if request.method.lower() in self.http_method_names:
+                handler = getattr(self, request.method.lower(),
+                                  self.http_method_not_allowed)
+            else:
+                handler = self.http_method_not_allowed
+
+            response = handler(request, *args, **kwargs)
+            self.post_method_call(request, response, *args, **kwargs)
+
+        except Exception as exc:
+            response = self.handle_exception(exc)
+
+        self.response = self.finalize_response(request, response, *args, **kwargs)
+
         self.post_dispatch(request, response, *args, **kwargs)
-        return response
+        return self.response
 
     def handle_exception(self, exc):
         """
@@ -164,10 +176,6 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
     def initial(self, request, *args, **kwargs):
         super().initial(request, *args, **kwargs)
         self.pre_method_call(request, *args, **kwargs)
-
-    def finalize_response(self, request, response, *args, **kwargs):
-        super().post_method_call(request, response, *args, **kwargs)
-        return super().finalize_response(request, response, *args, **kwargs)
 
     def check_permissions(self, request):
         self.pre_check_permissions(request)
