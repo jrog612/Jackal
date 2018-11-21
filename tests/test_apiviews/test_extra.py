@@ -61,7 +61,7 @@ class GetterResponseTestAPIView(JackalAPIView):
         return self.success()
 
 
-class APIViewTest(JackalAPITestCase):
+class APIViewExtraTest(JackalAPITestCase):
     def test_getter(self):
         append_dict = {'g': 'h'}
         response = self.client.post('/extra', append_dict)
