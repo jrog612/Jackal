@@ -180,7 +180,7 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
         self.post_check_object_permissions(request, obj)
 
     def get_object(self, request, **kwargs):
-        queryset = self.get_user_queryset(self.get_model().objects.all(), request)
+        queryset = self.get_user_queryset(queryset=self.get_model().objects.all(), request=request)
 
         f_class = self.get_query_filter_class()
         f = f_class(queryset=queryset, params=request.query_params)
@@ -193,7 +193,7 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
         return obj
 
     def get_filtered_queryset(self, request, **kwargs):
-        queryset = self.get_user_queryset(self.get_queryset(), request)
+        queryset = self.get_user_queryset(queryset=self.get_queryset(), request=request)
 
         f_class = self.get_query_filter_class()
         f = f_class(queryset=queryset, params=request.query_params)
