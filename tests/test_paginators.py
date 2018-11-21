@@ -1,15 +1,7 @@
-from rest_framework import serializers
-
 from jackal.paginators import JackalPaginator
 from jackal.settings import jackal_settings
 from jackal.tests import JackalTestCase
-from tests.models import TestModel
-
-
-class TestSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = TestModel
-        fields = ('field_int',)
+from tests.models import TestModel, TestSerializer
 
 
 class TestPaginator(JackalTestCase):

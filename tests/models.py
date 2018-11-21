@@ -1,4 +1,5 @@
 from django.db import models
+from rest_framework import serializers
 
 
 class TestModel(models.Model):
@@ -7,3 +8,9 @@ class TestModel(models.Model):
     field_text = models.TextField(null=True)
     field_a = models.IntegerField(null=True)
     field_b = models.IntegerField(null=True)
+
+
+class TestSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = TestModel
+        fields = '__all__'
