@@ -1,13 +1,22 @@
 from django.apps import apps
 from django.db.models import Q
+from django.shortcuts import _get_queryset
 
 from jackal.exceptions import NotFound
 from jackal.loaders import structure_loader
 from jackal.settings import jackal_settings
 
 
-def get_object_or_None(model, **fields):
-    return model.objects.filter(**fields).first()
+def get_object_or_None(klass, *args, **kwargs):
+    queryset = _get_queryset(klass)
+    try:
+        return queryset.get(*args, **kwargs)
+    except queryset.model.DoesNotExist:
+        return None
+
+
+def get_object_or(klass, this=None, *args, **kwargs):
+    return get_object_or_None(klass, *args, **kwargs) or this
 
 
 def get_object_or_404(model, **fields):
