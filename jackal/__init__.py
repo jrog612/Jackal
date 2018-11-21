@@ -9,7 +9,7 @@
 """
 
 __title__ = 'Jackal'
-__version__ = '1.5.0'
+__version__ = '1.6.0'
 __author__ = 'Yongjin Jo'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2018~ Yongjin Jo'

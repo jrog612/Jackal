@@ -4,7 +4,7 @@ from jackal.exceptions import NotFound
 from jackal.helpers.data_helper import isiter
 from jackal.settings import jackal_settings
 from jackal.shortcuts import get_object_or_404, get_object_or_None, model_update, operating, status_checker, \
-    status_readable
+    status_readable, get_object_or
 from jackal.structures import BaseStatusCondition, BaseStatusReadable
 from jackal.tests import JackalTransactionTestCase
 from tests.models import TestModel
@@ -62,6 +62,9 @@ class TestShortcuts(JackalTransactionTestCase):
 
         self.assertIs(res.exception.model, TestModel)
         self.assertEqual(get_object_or_404(TestModel, field_int=1), obj)
+
+        self.assertEqual('TestModel', get_object_or(TestModel, 'TestModel', field_int=2))
+        self.assertEqual(obj, get_object_or(TestModel, 'TestModel', field_int=1))
 
     def test_model_update(self):
         obj = TestModel.objects.create(field_int=1, field_char='text')
