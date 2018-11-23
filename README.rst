@@ -9,14 +9,8 @@ Jackal, the Boilerplate library for Django REST Framework
     :align: center
 
 
-**Jackal** 은 웹 백엔드 서버에서 필요한 기능들을 손쉽게 구현하도록 도와주는 Django 및 Django REST Framework(DRF) 기반 Boilerplate Library 입니다.
-
-**Jackal** 의 특징:
-
-* 모델 아이템의 생성, 조회, 수정, 삭제 및 페이지네이션 등의 구현을 돕는 Generic API Views.
-* GET query parameter 기반의 직관적인 필터링.
-* POST body 값을 모델 친화적으로 검증.
-* API View 확장성 증가
+**Jackal** is Boilerplate Library based on Django and Django REST Framework(DRF)
+that help you easily implement the necessary features on your web backend server.
 
 Installation
 ===============
@@ -29,9 +23,9 @@ Installation
 Document
 ============
 
-자세한 사항은 위키_ 참조
+See wiki_ for details.
 
-.. _위키: https://github.com/joyongjin/jackal/wiki
+.. _wiki: https://github.com/joyongjin/jackal/wiki
 
 Test
 ============
