@@ -135,12 +135,12 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
         self.kwargs = kwargs
         request = self.initialize_request(request, *args, **kwargs)
         self.request = request
-        self.headers = self.default_response_headers  # deprecate?
+        self.headers = self.default_response_headers
 
         try:
             self.initial(request, *args, **kwargs)
+            self.request = self.append_inspect_data(request, *args, **kwargs)
 
-            # Get the appropriate handler method
             if request.method.lower() in self.http_method_names:
                 handler = getattr(self, request.method.lower(),
                                   self.http_method_not_allowed)
@@ -171,8 +171,7 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
         else:
             return super().handle_exception(exc)
 
-    def initialize_request(self, request, *args, **kwargs):
-        request = super().initialize_request(request, *args, **kwargs)
+    def append_inspect_data(self, request, *args, **kwargs):
         request.inspected_data = self.get_inspected_data(request)
         return request
 
