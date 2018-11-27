@@ -99,6 +99,9 @@ class _PrePost:
     def post_check_object_permissions(self, request, obj):
         pass
 
+    def pre_handle_exception(self, exc):
+        pass
+
 
 class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
     default_permission_classes = ()
@@ -120,30 +123,30 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
     query_filter = JackalQueryFilter
     inspector_class = Inspector
 
+    ordering_key = None
+
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
         self.permission_classes += self.default_permission_classes
         self.authentication_classes += self.default_authentication_classes
 
     def dispatch(self, request, *args, **kwargs):
-        self.pre_dispatch(request, *args, **kwargs)
-
         self.args = args
         self.kwargs = kwargs
         request = self.initialize_request(request, *args, **kwargs)
         self.request = request
-        self.headers = self.default_response_headers  # deprecate?
+        self.headers = self.default_response_headers
 
         try:
             self.initial(request, *args, **kwargs)
+            self.request = self.append_inspect_data(request, *args, **kwargs)
 
-            # Get the appropriate handler method
             if request.method.lower() in self.http_method_names:
                 handler = getattr(self, request.method.lower(),
                                   self.http_method_not_allowed)
             else:
                 handler = self.http_method_not_allowed
-
+            self.pre_method_call(request, *args, **kwargs)
             response = handler(request, *args, **kwargs)
             self.post_method_call(request, response, *args, **kwargs)
 
@@ -152,13 +155,13 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
 
         self.response = self.finalize_response(request, response, *args, **kwargs)
 
-        self.post_dispatch(request, response, *args, **kwargs)
         return self.response
 
     def handle_exception(self, exc):
         """
         high jacking exception and handle with jackal_exception_handler
         """
+        self.pre_handle_exception(exc)
         jackal_handler = self.get_jackal_exception_handler()
         context = self.get_exception_handler_context()
         response = jackal_handler(exc, context)
@@ -168,14 +171,9 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
         else:
             return super().handle_exception(exc)
 
-    def initialize_request(self, request, *args, **kwargs):
-        request = super().initialize_request(request, *args, **kwargs)
+    def append_inspect_data(self, request, *args, **kwargs):
         request.inspected_data = self.get_inspected_data(request)
         return request
-
-    def initial(self, request, *args, **kwargs):
-        super().initial(request, *args, **kwargs)
-        self.pre_method_call(request, *args, **kwargs)
 
     def check_permissions(self, request):
         self.pre_check_permissions(request)
