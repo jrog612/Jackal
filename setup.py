@@ -7,7 +7,7 @@ from shutil import rmtree
 from setuptools import Command, setup, find_packages
 
 here = os.path.abspath(os.path.dirname(__file__))
-VERSION = __import__('pend').__version__
+VERSION = __import__('jackal').__version__
 
 
 def read(f):
