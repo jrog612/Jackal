@@ -8,7 +8,7 @@
 
 """
 
-from .__version__ import __VERSION__
+from .__version__ import __version__
 
 __title__ = 'Jackal'
 __author__ = 'Yongjin Jo'
