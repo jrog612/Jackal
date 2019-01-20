@@ -1,21 +1,54 @@
 import os
-import re
+import sys
+from shutil import rmtree
 
-from setuptools import setup, find_packages
+from setuptools import Command, setup, find_packages
+
+here = os.path.abspath(os.path.dirname(__file__))
+VERSION = __import__('pend').__version__
 
 
 def read(f):
     return open(f, 'r', encoding='utf-8').read()
 
 
-def get_version():
-    init_py = open(os.path.join('jackal', '__init__.py')).read()
-    return re.search("__version__ = ['\"]([^'\"]+)['\"]", init_py).group(1)
+class UploadCommand(Command):
+    """Support setup.py upload."""
+
+    description = 'Build and publish the package.'
+    user_options = []
+
+    @staticmethod
+    def status(s):
+        """Prints things in bold."""
+        print('\033[1m{0}\033[0m'.format(s))
+
+    def initialize_options(self):
+        pass
+
+    def finalize_options(self):
+        pass
+
+    def run(self):
+        try:
+            self.status('Removing previous builds…')
+            rmtree(os.path.join(here, 'dist'))
+            rmtree(os.path.join(here, 'build'))
+            rmtree(os.path.join(here, 'jackal.egg-info'))
+        except OSError:
+            pass
+
+        self.status('Building Source and Wheel (universal) distribution…')
+        os.system('{0} setup.py sdist bdist_wheel --universal'.format(sys.executable))
+
+        self.status('Uploading the package to PyPI via Twine…')
+        os.system('twine upload dist/*')
+        sys.exit()
 
 
 setup(
     name='django_jackal',
-    version=get_version(),
+    version=VERSION,
     description='Boilerplate for Django and Django REST Framework',
     long_description=read('README.rst'),
     long_description_content_type='text/x-rst',
@@ -35,5 +68,8 @@ setup(
     install_requires=[
         'django>=2.0', 'djangorestframework', 'python-dateutil',
     ],
-    python_requires='>=3.5'
+    python_requires='>=3.5',
+    cmdclass={
+        'upload': UploadCommand,
+    }
 )

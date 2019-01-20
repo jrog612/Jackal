@@ -8,10 +8,9 @@
 
 """
 
+from .__version__ import __VERSION__
+
 __title__ = 'Jackal'
-__version__ = '1.6.3'
 __author__ = 'Yongjin Jo'
 __license__ = 'MIT'
 __copyright__ = 'Copyright 2018~ Yongjin Jo'
-
-VERSION = __version__
