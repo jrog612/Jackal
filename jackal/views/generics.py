@@ -38,7 +38,7 @@ class DetailUpdateDestroyGeneric(JackalAPIView):
 class PaginateListGeneric(JackalAPIView):
     default_page_number = 1
     default_page_length = None
-    page_number_key = 'page_num'
+    page_number_key = 'page_number'
     page_length_key = 'page_length'
 
     def paginated_list(self, request, **kwargs):
