@@ -47,7 +47,7 @@ class PaginateListGeneric(JackalAPIView):
 
     def paginated_data(self, request, queryset):
         page_num = request.query_params.get(self.page_number_key, self.default_page_number)
-        page_length = request.query_params.get(self.page_number_key, self.default_page_length)
+        page_length = request.query_params.get(self.page_length_key, self.default_page_length)
         paginator = JackalPaginator(queryset, page_num, page_length)
         response_data = paginator.serialized_data(
             self.get_serializer_class(), self.get_serializer_context()
