@@ -123,7 +123,7 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
     query_filter = JackalQueryFilter
     inspector_class = Inspector
 
-    ordering_key = None
+    ordering_key = 'ordering'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
