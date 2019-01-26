@@ -51,7 +51,7 @@ class JackalQueryFilter:
             else:
                 filterable[filter_keyword] = param_value
 
-        self.queryset = queryset.filter(*filterable_q_objects, **filterable)
+        self.queryset = queryset.filter(**filterable).filter(*filterable_q_objects)
         return self
 
     def search(self, search_dict, search_keyword_key='search_keyword', search_type_key='search_type'):
