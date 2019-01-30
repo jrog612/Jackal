@@ -13,7 +13,7 @@ class TestQueryFilter(JackalTransactionTestCase):
         self.max_length = 10
         self.objs = [TestModel(
             field_int=i, field_char=random.choice(['A Char', 'B Char', 'C Char']),
-            field_text=random.choice(['A Char', 'B Char', 'C Char']),
+            field_text=random.choice(['A Text', 'B Text', 'C Text']),
         ) for i in range(1, self.max_length + 1)]
         TestModel.objects.bulk_create(self.objs)
         self.filter_map = {
@@ -56,19 +56,24 @@ class TestQueryFilter(JackalTransactionTestCase):
         queryset = f.search(self.search_dict).queryset
         self.assertEqualQuerySet(TestModel.objects.all(), queryset)
 
-        params = {'search_keyword': 'A Text'}
+        first_model = TestModel.objects.first()
+        search_keyword = first_model.field_char
+
+        params = {'search_keyword': search_keyword}
         f = JackalQueryFilter(TestModel.objects.all(), params)
         queryset = f.search(self.search_dict).queryset
         self.assertEqualQuerySet(TestModel.objects.filter(
-            Q(field_char__contains='A Text') |
-            Q(field_text__contains='A Text') |
-            Q(field_int__contains='A Text')
+            Q(field_char__contains=search_keyword) |
+            Q(field_text__contains=search_keyword) |
+            Q(field_int__contains=search_keyword)
         ), queryset)
+        self.assertIn(first_model, queryset)
 
-        params = {'search_keyword': 'A Text', 'search_type': 'field_char'}
+        params = {'search_keyword': search_keyword, 'search_type': 'field_text'}
         f = JackalQueryFilter(TestModel.objects.all(), params)
         queryset = f.search(self.search_dict).queryset
-        self.assertEqualQuerySet(TestModel.objects.filter(field_char__contains='A Text'), queryset)
+        self.assertEqualQuerySet(TestModel.objects.filter(field_text__contains=search_keyword), queryset)
+        self.assertNotIn(first_model, queryset)
 
     def test_get(self):
         f = JackalQueryFilter(TestModel.objects.all())

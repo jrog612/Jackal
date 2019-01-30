@@ -123,7 +123,7 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
     query_filter = JackalQueryFilter
     inspector_class = Inspector
 
-    ordering_key = None
+    ordering_key = 'ordering'
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -209,7 +209,7 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
         extra_kwargs = self.get_extra_kwargs()
         extra_kwargs.update(JackalDictMapper.av2bv(lookup_map, kwargs))
 
-        queryset = f.filter_map(filter_map).extra(**extra_kwargs).queryset.distinct('id')
+        queryset = f.filter_map(filter_map).extra(**extra_kwargs).ordering(self.ordering_key).queryset.distinct()
         return queryset
 
     def get_user_queryset(self, request, queryset=None):
