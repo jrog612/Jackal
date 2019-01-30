@@ -19,7 +19,6 @@ class JSONField(TextField):
     def __init__(self, *args, **kwargs):
         self.serializer = kwargs.pop('serializer', dumps)
         self.deserializer = kwargs.pop('deserializer', json.loads)
-
         super(JSONField, self).__init__(*args, **kwargs)
 
     def deconstruct(self):
@@ -31,7 +30,6 @@ class JSONField(TextField):
     def to_python(self, value):
         if value == "":
             return None
-
         try:
             if isinstance(value, six.string_types):
                 return self.deserializer(value)
