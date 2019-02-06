@@ -15,7 +15,7 @@ class JackalQueryFilter:
     def _get_query_function(key):
         for n, callback in query_function_loader().items():
             if key.find(n) >= 0:
-                return key.replace(n, ''), callback
+                return key.replace('__{}'.format(n), ''), callback
         else:
             return key, None
 
