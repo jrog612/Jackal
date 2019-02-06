@@ -8,6 +8,7 @@ class TestModel(models.Model):
     field_text = models.TextField(null=True)
     field_a = models.IntegerField(null=True)
     field_b = models.IntegerField(null=True)
+    field_bool = models.BooleanField(default=True)
 
 
 class TestSerializer(serializers.ModelSerializer):

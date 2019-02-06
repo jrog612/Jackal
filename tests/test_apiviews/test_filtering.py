@@ -7,7 +7,8 @@ class FilteringTestAPI(JackalAPIView):
     model = TestModel
     queryset = TestModel.objects.all()
     filter_map = {
-        'field_char': 'field_char__contains'
+        'field_char': 'field_char__contains',
+        'field_bool__to_boolean': 'field_bool'
     }
     extra_kwargs = {
         'field_int': 1
@@ -41,7 +42,7 @@ class TestAPIViewFiltering(JackalAPITestCase):
         self.assertEqual(result['id'], obj.id)
 
     def test_get_filtered_queryset(self):
-        obj1 = TestModel.objects.create(field_int=1, field_char='char')
+        obj1 = TestModel.objects.create(field_int=1, field_char='char', field_bool=False)
         obj2 = TestModel.objects.create(field_int=1, field_char='chock')
         TestModel.objects.create(field_int=1, field_char='bb')
         TestModel.objects.create(field_int=2, field_char='ch')
@@ -60,3 +61,11 @@ class TestAPIViewFiltering(JackalAPITestCase):
         self.assertSuccess(response)
         self.assertLen(1, result)
         self.assertEqual(obj1.id, result[0]['id'])
+
+        response = self.client.get('/filtering', {'kind': 'queryset', 'field_char': 'char', 'field_bool': False})
+        result = response.json()
+
+        self.assertSuccess(response)
+        self.assertLen(1, result)
+        self.assertEqual(obj1.id, result[0]['id'])
+
