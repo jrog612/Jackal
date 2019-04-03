@@ -1,6 +1,8 @@
 from django.db import models
 from rest_framework import serializers
 
+from jackal.models import JackalModel
+
 
 class TestModel(models.Model):
     field_char = models.CharField(null=True, max_length=1)

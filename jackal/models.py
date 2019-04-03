@@ -24,7 +24,7 @@ class JackalModel(models.Model):
         return super().__str__()
 
     def delete(self, using=None, *args, **kwargs):
-        if kwargs.get('soft', self.soft_delete):
+        if kwargs.pop('soft', self.soft_delete):
             self.deleted_at = timezone.now()
             self.save(using=using)
         else:

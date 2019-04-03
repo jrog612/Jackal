@@ -1,5 +1,6 @@
 import random
 
+from django.db.models import QuerySet
 from django.test import TransactionTestCase, TestCase
 from rest_framework.test import APITestCase
 
@@ -8,6 +9,8 @@ class _TestMixin:
     rd = random
 
     def assertLen(self, length, seq):
+        if isinstance(seq, QuerySet):
+            assert length == seq.count()
         assert length == len(seq)
 
     def assertLenEqual(self, seq1, seq2):
