@@ -30,6 +30,7 @@ class TestInspector(TestCase):
         result = ins.inspected_data
 
         self.assertEqual({'a': 'a', 'b': 'a', 'd': 'a'}, result)
+        self.assertNotIn('c', result)
 
     def test_required(self):
         pre_inspect = {
