@@ -18,10 +18,10 @@ class Command(TemplateCommand):
 
     create_file = {
         'serializer.py': 'from rest_framework import serializers\n\n',
-        'mixin/model_mixin.py': '',
-        'mixin/view_mixin.py': '',
-        'views.py': 'from jackal.views import generics'
     }
+    remove_file = [
+        'tests.py', 'admin.py', 'views.py',
+    ]
 
     def handle(self, **options):
         app_name = options.pop('name')
@@ -45,12 +45,8 @@ class Command(TemplateCommand):
         if app_path is None:
             app_path = os.path.join(os.getcwd(), app_name)
 
-        os.remove(app_path + '/tests.py')
-        os.remove(app_path + '/admin.py')
-        os.remove(app_path + '/views.py')
-        os.mkdir(app_path + '/mixin')
-
-        open(app_path + '/mixin/__init__.py', 'w').write('')
+        for file in self.remove_file:
+            os.remove(app_path + '/' + file)
 
         for file_name, inner_data in self.create_file.items():
             with open(app_path + '/{}'.format(file_name), 'w') as f:
