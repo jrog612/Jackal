@@ -42,6 +42,10 @@ class _Getter:
         d = self.filter_map
         return {**d, **additional}
 
+    def get_search_dict(self, **additional):
+        d = self.search_dict
+        return {**d, **additional}
+
     def get_extra_kwargs(self, **additional):
         d = self.extra_kwargs
         return {**d, **additional}
@@ -118,6 +122,8 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
     extra_kwargs = {}
     inspect_map = {}
     user_field = ''
+    search_keyword_key = 'search_keyword'
+    search_type_key = 'search_type'
 
     serializer_class = None
     query_filter = JackalQueryFilter
@@ -206,10 +212,19 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
 
         lookup_map = self.get_lookup_map()
         filter_map = self.get_filter_map()
+        search_dict = self.get_search_dict()
         extra_kwargs = self.get_extra_kwargs()
         extra_kwargs.update(JackalDictMapper.av2bv(lookup_map, kwargs))
 
-        queryset = f.filter_map(filter_map).extra(**extra_kwargs).ordering(self.ordering_key).queryset.distinct()
+        queryset = f.search(
+            search_dict,
+            search_keyword_key=self.search_keyword_key,
+            search_type_key=self.search_type_key
+        ).filter_map(filter_map).extra(
+            **extra_kwargs
+        ).ordering(
+            self.ordering_key
+        ).queryset.distinct()
         return queryset
 
     def get_user_queryset(self, request, queryset=None):
