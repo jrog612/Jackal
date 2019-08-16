@@ -9,7 +9,7 @@ class ListCreateGeneric(JackalAPIView):
     def list(self, request, **kwargs):
         serializer_class = self.get_serializer_class()
         filtered_queryset = self.get_filtered_queryset(request, **kwargs)
-        ser = serializer_class(instance=filtered_queryset, many=True)
+        ser = serializer_class(instance=filtered_queryset, many=True, context=self.get_serializer_context())
         return self.simple_response(ser.data)
 
     def create(self, request, **kwargs):
@@ -21,7 +21,7 @@ class ListCreateGeneric(JackalAPIView):
 class DetailUpdateDestroyGeneric(JackalAPIView):
     def detail(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
-        ser = self.serializer_class(obj)
+        ser = self.serializer_class(obj, context=self.get_serializer_context())
         return self.simple_response(ser.data)
 
     def update(self, request, **kwargs):
