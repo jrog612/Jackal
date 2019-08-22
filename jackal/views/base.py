@@ -4,6 +4,7 @@ from rest_framework.views import APIView
 from jackal.filters import JackalQueryFilter
 from jackal.helpers.data_helper import JackalDictMapper
 from jackal.inspectors import Inspector
+from jackal.paginators import JackalPaginator
 from jackal.settings import jackal_settings
 
 
@@ -122,14 +123,20 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
     extra_kwargs = {}
     inspect_map = {}
     user_field = ''
+
+    default_page_number = 1
+    default_page_length = None
+
     search_keyword_key = 'search_keyword'
     search_type_key = 'search_type'
+    page_number_key = 'page_number'
+    page_length_key = 'page_length'
+    ordering_key = 'ordering'
 
     serializer_class = None
     query_filter = JackalQueryFilter
     inspector_class = Inspector
-
-    ordering_key = 'ordering'
+    paginator_class = JackalPaginator
 
     def __init__(self, *args, **kwargs):
         super().__init__(*args, **kwargs)
@@ -248,6 +255,25 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
                 return request.data.dict()
             else:
                 return request.data
+
+    def get_paginator_class(self):
+        return self.paginator_class
+
+    def get_response_data(self, request, **kwargs):
+        pass
+
+    def get_paginated_data(self, request, queryset):
+        page_num = request.query_params.get(self.page_number_key, self.default_page_number)
+        page_length = request.query_params.get(self.page_length_key, self.default_page_length)
+
+        paginator_class = self.get_paginator_class()
+        paginator = paginator_class(queryset, page_num, page_length)
+
+        paginated_data = paginator.serialized_data(
+            serializer_class=self.get_serializer_class(),
+            context=self.get_serializer_context()
+        )
+        return paginated_data
 
 
 class JackalAPIView(JackalBaseAPIView):

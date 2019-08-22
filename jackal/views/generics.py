@@ -6,11 +6,15 @@ from jackal.views.base import JackalAPIView
 
 
 class ListCreateGeneric(JackalAPIView):
-    def list(self, request, **kwargs):
+    def get_response_data(self, request, **kwargs):
         serializer_class = self.get_serializer_class()
         filtered_queryset = self.get_filtered_queryset(request, **kwargs)
         ser = serializer_class(instance=filtered_queryset, many=True, context=self.get_serializer_context())
-        return self.simple_response(ser.data)
+        return ser.data
+
+    def list(self, request, **kwargs):
+        response_data = self.get_response_data(request, **kwargs)
+        return self.simple_response(response_data)
 
     def create(self, request, **kwargs):
         model = self.get_model()
@@ -19,10 +23,14 @@ class ListCreateGeneric(JackalAPIView):
 
 
 class DetailUpdateDestroyGeneric(JackalAPIView):
-    def detail(self, request, **kwargs):
+    def get_response_data(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
         ser = self.serializer_class(obj, context=self.get_serializer_context())
-        return self.simple_response(ser.data)
+        return ser.data
+
+    def detail(self, request, **kwargs):
+        response_data = self.get_response_data(request, **kwargs)
+        return self.simple_response(response_data)
 
     def update(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
@@ -36,23 +44,12 @@ class DetailUpdateDestroyGeneric(JackalAPIView):
 
 
 class PaginateListGeneric(JackalAPIView):
-    default_page_number = 1
-    default_page_length = None
-    page_number_key = 'page_number'
-    page_length_key = 'page_length'
+    def get_response_data(self, request, **kwargs):
+        queryset = self.get_filtered_queryset(request, **kwargs)
+        return self.get_paginated_data(request, queryset)
 
     def paginated_list(self, request, **kwargs):
-        queryset = self.get_filtered_queryset(request, **kwargs)
-        return self.paginated_data(request, queryset)
-
-    def paginated_data(self, request, queryset):
-        page_num = request.query_params.get(self.page_number_key, self.default_page_number)
-        page_length = request.query_params.get(self.page_length_key, self.default_page_length)
-        paginator = JackalPaginator(queryset, page_num, page_length)
-        response_data = paginator.serialized_data(
-            self.get_serializer_class(), self.get_serializer_context()
-        )
-        return self.simple_response(response_data)
+        return self.get_response_data(request, **kwargs)
 
 
 class SimpleGeneric(JackalAPIView):
