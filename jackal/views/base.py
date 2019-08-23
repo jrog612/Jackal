@@ -59,8 +59,8 @@ class _Getter:
     def get_serializer_class(self):
         return self.serializer_class
 
-    def get_serializer_context(self):
-        return {}
+    def get_serializer_context(self, **kwargs):
+        return kwargs
 
     def get_jackal_exception_handler(self):
         return jackal_settings.EXCEPTION_HANDLER
