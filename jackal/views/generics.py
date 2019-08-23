@@ -49,7 +49,8 @@ class PaginateListGeneric(JackalAPIView):
         return self.get_paginated_data(request, queryset)
 
     def paginated_list(self, request, **kwargs):
-        return self.get_response_data(request, **kwargs)
+        response_data = self.get_response_data(request, **kwargs)
+        return self.simple_response(response_data)
 
 
 class SimpleGeneric(JackalAPIView):
