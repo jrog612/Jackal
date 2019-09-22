@@ -4,8 +4,8 @@ verify_ssl = true
 name = "pypi"
 
 [packages]
-django = "*"
-django-rest-framework = "*"
+django = ">=2.1.11"
+djangorestframework = ">=3.9.1"
 python-dateutil = "*"
 
 [dev-packages]
