@@ -78,6 +78,18 @@ class _Getter:
     def get_user_field(self):
         return self.user_field
 
+    def get_permission_classes(self):
+        return self.default_permission_classes + self.permission_classes
+
+    def get_authentication_classes(self):
+        return self.default_authentication_classes + self.authentication_classes
+
+    def get_authenticators(self):
+        return [auth() for auth in self.get_authentication_classes()]
+
+    def get_permissions(self):
+        return [permission() for permission in self.get_permission_classes()]
+
 
 class _PrePost:
     def pre_method_call(self, request, *args, **kwargs):
@@ -108,7 +120,7 @@ class _PrePost:
         pass
 
 
-class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
+class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
     default_permission_classes = ()
     default_authentication_classes = ()
     permission_classes = ()
@@ -137,11 +149,6 @@ class JackalBaseAPIView(APIView, _Getter, _PrePost, _Response):
     query_filter = JackalQueryFilter
     inspector_class = Inspector
     paginator_class = JackalPaginator
-
-    def __init__(self, *args, **kwargs):
-        super().__init__(*args, **kwargs)
-        self.permission_classes += self.default_permission_classes
-        self.authentication_classes += self.default_authentication_classes
 
     def dispatch(self, request, *args, **kwargs):
         self.args = args
