@@ -1,6 +1,5 @@
 from rest_framework import serializers
 
-from jackal.paginators import JackalPaginator
 from jackal.shortcuts import model_update
 from jackal.views.base import JackalAPIView
 
@@ -88,7 +87,8 @@ class LabelValueListGeneric(JackalAPIView):
     def label_value_list(self, request, **kwargs):
         queryset = self.get_filtered_queryset(request, **kwargs)
         ser_class = self.get_serializer_class()
-        return self.simple_response(ser_class(queryset, many=True))
+        serialized_data = ser_class(queryset, many=True)
+        return self.simple_response(serialized_data.data)
 
 
 class DetailMixin(DetailUpdateDestroyGeneric):
