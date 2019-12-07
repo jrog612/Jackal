@@ -2,6 +2,15 @@ class BindMixin:
     bound_fields = []
     bind_field_name = 'extra'
 
+    def __init__(self, *args, **kwargs):
+        bind_data = {}
+        for bound_field in self.bound_fields:
+            value = kwargs.pop(bound_field, None)
+            if value is not None:
+                bind_data[bound_field] = value
+        kwargs[self.bind_field_name] = bind_data
+        super().__init__(*args, **kwargs)
+
     def __setattr__(self, key, value):
         if key in ['bound_fields', 'bind_field_name']:
             super().__setattr__(key, value)
