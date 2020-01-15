@@ -159,8 +159,6 @@ class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
 
         try:
             self.initial(request, *args, **kwargs)
-            self.request = self.append_inspect_data(request, *args, **kwargs)
-
             if request.method.lower() in self.http_method_names:
                 handler = getattr(self, request.method.lower(),
                                   self.http_method_not_allowed)
@@ -190,10 +188,6 @@ class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
             return response
         else:
             return super().handle_exception(exc)
-
-    def append_inspect_data(self, request, *args, **kwargs):
-        request.inspected_data = self.get_inspected_data(request)
-        return request
 
     def check_permissions(self, request):
         self.pre_check_permissions(request)
@@ -254,14 +248,8 @@ class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
     def get_inspected_data(self, request):
         inspector = self.get_inspector(request)
         if inspector is not None:
-            request.is_inspected = True
             return inspector.inspected_data
-        else:
-            request.is_inspected = False
-            if hasattr(request.data, 'dict'):
-                return request.data.dict()
-            else:
-                return request.data
+        return dict()
 
     def get_paginator_class(self):
         return self.paginator_class
