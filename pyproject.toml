@@ -1,0 +1,17 @@
+[tool.poetry]
+name = "django-jackal"
+version = "2.1.0"
+description = ""
+authors = ["joyongjin <wnrhd114@gmail.com>"]
+license = "MIT"
+
+[tool.poetry.dependencies]
+python = "^3.6"
+django = "^3.0.2"
+djangorestframework = "^3.11.0"
+
+[tool.poetry.dev-dependencies]
+
+[build-system]
+requires = ["poetry>=0.12"]
+build-backend = "poetry.masonry.api"
