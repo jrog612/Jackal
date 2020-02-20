@@ -48,6 +48,8 @@ class JackalQueryFilter:
             #     call_back: to_list function at DefaultQueryFunction
             if map_key.find('[]') > 0 and hasattr(self.params, 'getlist'):  # django drf query_params getlist support
                 param_value = self.params.getlist(map_key)
+                if param_value in [None, '', []]:
+                    continue  # if empty, skip
             else:
                 param_value = self.params.get(map_key)
             # eg) param_value  : 'django,python'
