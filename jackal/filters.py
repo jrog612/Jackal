@@ -7,9 +7,7 @@ from jackal.shortcuts import gen_q
 class JackalQueryFilter:
     def __init__(self, queryset, params=None):
         self.queryset = queryset
-        if params is None:
-            params = {}
-        self.params = params
+        self.params = params or {}
 
     @staticmethod
     def _get_query_function(key):
@@ -25,13 +23,15 @@ class JackalQueryFilter:
             'name': 'Yongjin',
             'age_lowest': '20',
             'skills': 'django,python',
+            'status[]': [1, 2, 3],
         }
         f = JackalQueryFilter(User.objects.all(), params)
 
         queryset = f.filter_map({
             'name': 'name__contains',
             'age_lowest': 'age__gte',
-            'skills__to_list': 'skills__in'
+            'skills__to_list': 'skills__in',
+            'status[]': 'status__in',
         }).queryset
         """
 
@@ -46,7 +46,10 @@ class JackalQueryFilter:
             map_key, callback = self._get_query_function(map_key)
             # eg) map_key  : skills
             #     call_back: to_list function at DefaultQueryFunction
-            param_value = self.params.get(map_key)
+            if map_key.find('[]') > 0 and hasattr(self.params, 'getlist'):  # django drf query_params getlist support
+                param_value = self.params.getlist(map_key)
+            else:
+                param_value = self.params.get(map_key)
             # eg) param_value  : 'django,python'
 
             if param_value in [None, '']:
