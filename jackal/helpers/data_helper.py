@@ -1,7 +1,5 @@
 import collections
 
-import six
-
 
 class JackalDictMapper:
     @staticmethod
@@ -10,4 +8,4 @@ class JackalDictMapper:
 
 
 def isiter(arg):
-    return isinstance(arg, collections.Iterable) and not isinstance(arg, six.string_types)
+    return isinstance(arg, collections.Iterable) and not isinstance(arg, str)

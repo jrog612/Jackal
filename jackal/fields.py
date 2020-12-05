@@ -2,7 +2,6 @@ import json
 
 from django.core.serializers.json import DjangoJSONEncoder
 from django.db.models import TextField
-from django.utils import six
 
 
 def dumps(value):
@@ -31,7 +30,7 @@ class JSONField(TextField):
         if value == "":
             return None
         try:
-            if isinstance(value, six.string_types):
+            if isinstance(value, str):
                 return self.deserializer(value)
             elif isinstance(value, bytes):
                 return self.deserializer(value.decode('utf8'))
