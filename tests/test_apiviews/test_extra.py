@@ -31,12 +31,6 @@ class GetterResponseTestAPIView(JackalAPIView):
 
         if case == 'success':
             return self.success(extra_info=extra_info)
-        elif case == 'bad_request':
-            return self.bad_request(extra_info=extra_info)
-        elif case == 'forbidden':
-            return self.forbidden(extra_info=extra_info)
-        elif case == 'internal_server_error':
-            return self.internal_server_error(extra_info=extra_info)
 
     def post(self, request):
         append_dict = request.data.dict()
@@ -66,28 +60,3 @@ class APIViewExtraTest(JackalAPITestCase):
         append_dict = {'g': 'h'}
         response = self.client.post('/extra', append_dict)
         self.assertSuccess(response)
-
-    def test_response(self):
-        case = 'success'
-        response = self.client.get('/extra', {'case': case, 'extra_info': 'extra_info'})
-        self.assertSuccess(response)
-        self.assertIn('extra_info', response.json())
-        self.assertEqual('extra_info', response.json()['extra_info'])
-
-        case = 'bad_request'
-        response = self.client.get('/extra', {'case': case, 'extra_info': 'extra_info'})
-        self.assertStatusCode(400, response)
-        self.assertIn('extra_info', response.json())
-        self.assertEqual('extra_info', response.json()['extra_info'])
-
-        case = 'forbidden'
-        response = self.client.get('/extra', {'case': case, 'extra_info': 'extra_info'})
-        self.assertStatusCode(403, response)
-        self.assertIn('extra_info', response.json())
-        self.assertEqual('extra_info', response.json()['extra_info'])
-
-        case = 'internal_server_error'
-        response = self.client.get('/extra', {'case': case, 'extra_info': 'extra_info'})
-        self.assertStatusCode(500, response)
-        self.assertIn('extra_info', response.json())
-        self.assertEqual('extra_info', response.json()['extra_info'])

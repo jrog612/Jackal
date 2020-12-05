@@ -18,7 +18,7 @@ class ListCreateGeneric(JackalAPIView):
     def create(self, request, **kwargs):
         model = self.get_model()
         obj = model.objects.create(**self.get_inspected_data(request))
-        return self.success(id=obj.id)
+        return self.simple_response({'id': obj.id})
 
 
 class DetailUpdateDestroyGeneric(JackalAPIView):
@@ -34,12 +34,12 @@ class DetailUpdateDestroyGeneric(JackalAPIView):
     def update(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
         model_update(obj, **self.get_inspected_data(request))
-        return self.success(id=obj.id)
+        return self.simple_response({'id': obj.id})
 
     def destroy(self, request, **kwargs):
         obj = self.get_object(request, **kwargs)
         obj.delete()
-        return self.success()
+        return self.simple_response()
 
 
 class PaginateListGeneric(JackalAPIView):

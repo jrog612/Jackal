@@ -8,23 +8,6 @@ from jackal.paginators import JackalPaginator
 from jackal.settings import jackal_settings
 
 
-class _Response:
-    def success(self, detail='success', **kwargs):
-        return Response({'detail': detail, **kwargs})
-
-    def simple_response(self, result=None, status=200, headers=None, **kwargs):
-        return Response(result, status=status, headers=headers, **kwargs)
-
-    def bad_request(self, **data):
-        return Response(data, status=400)
-
-    def forbidden(self, **data):
-        return Response(data, status=403)
-
-    def internal_server_error(self, **data):
-        return Response(data, status=500)
-
-
 class _Getter:
     def get_queryset(self):
         return self.queryset
@@ -135,7 +118,7 @@ class _PrePost:
         pass
 
 
-class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
+class JackalBaseAPIView(_Getter, _PrePost, APIView):
     default_permission_classes = ()
     default_authentication_classes = ()
     permission_classes = ()
@@ -151,6 +134,9 @@ class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
     inspect_map = {}
     user_field = ''
     bind_user_field = None
+
+    result_root = None
+    result_meta = 'meta'
 
     default_page_number = 1
     default_page_length = None
@@ -288,6 +274,21 @@ class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
 
     def has_auth(self):
         return self.request.user is not None and self.request.user.is_authenticated
+
+    def _response(self, result=None, status=200, meta=None, headers=None, **kwargs):
+        response_data = {}
+        if self.result_root:
+            response_data[self.result_root] = result or dict()
+        else:
+            response_data = result or dict()
+
+        if self.result_meta:
+            response_data[self.result_meta] = meta or dict()
+
+        return Response(response_data, status=status, headers=headers, **kwargs)
+
+    def simple_response(self, result=None, status=200, meta=None, headers=None, **kwargs):
+        return self._response(result, status=status, meta=meta, headers=headers, **kwargs)
 
 
 class JackalAPIView(JackalBaseAPIView):
