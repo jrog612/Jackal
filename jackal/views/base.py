@@ -62,6 +62,13 @@ class _Getter:
     def get_serializer_context(self, **kwargs):
         return kwargs
 
+    def get_serializer_data(self, instance, context=None, many=False, klass=None):
+        if klass is None:
+            klass = self.get_serializer_class()
+        context = self.get_serializer_context(**(context or dict()))
+        ser = klass(instance, many=many, context=context)
+        return ser.data
+
     def get_jackal_exception_handler(self):
         return jackal_settings.EXCEPTION_HANDLER
 
@@ -89,6 +96,14 @@ class _Getter:
 
     def get_permissions(self):
         return [permission() for permission in self.get_permission_classes()]
+
+    def get_client_ip(self, request):
+        x_forwarded_for = request.META.get('HTTP_X_FORWARDED_FOR')
+        if x_forwarded_for:
+            ip = x_forwarded_for.split(',')[0]
+        else:
+            ip = request.META.get('REMOTE_ADDR')
+        return ip
 
 
 class _PrePost:
@@ -135,6 +150,7 @@ class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
     extra_kwargs = {}
     inspect_map = {}
     user_field = ''
+    bind_user_field = None
 
     default_page_number = 1
     default_page_length = None
@@ -269,6 +285,9 @@ class JackalBaseAPIView(_Getter, _PrePost, _Response, APIView):
             context=self.get_serializer_context()
         )
         return paginated_data
+
+    def has_auth(self):
+        return self.request.user is not None and self.request.user.is_authenticated
 
 
 class JackalAPIView(JackalBaseAPIView):
