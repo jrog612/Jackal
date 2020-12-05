@@ -1,9 +1,13 @@
 [tool.poetry]
 name = "django-jackal"
-version = "2.1.0"
-description = ""
+version = "2.3.0"
+description = "Boilerplate for Django and Django REST Framework"
 authors = ["joyongjin <wnrhd114@gmail.com>"]
 license = "MIT"
+readme = 'README.rst'
+repository = 'https://github.com/joyongjin/jackal'
+homepage = 'https://github.com/joyongjin/jackal'
+exclude = ['test*', '.*']
 
 [tool.poetry.dependencies]
 python = "^3.6"
