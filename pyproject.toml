@@ -7,6 +7,9 @@ license = "MIT"
 readme = 'README.rst'
 repository = 'https://github.com/joyongjin/jackal'
 homepage = 'https://github.com/joyongjin/jackal'
+packages = [
+    { include = 'jackal' }
+]
 exclude = ['test*', '.*']
 
 [tool.poetry.dependencies]
