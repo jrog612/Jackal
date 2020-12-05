@@ -132,6 +132,7 @@ class JackalBaseAPIView(_Getter, _PrePost, APIView):
     search_dict = {}
     extra_kwargs = {}
     inspect_map = {}
+
     user_field = ''
     bind_user_field = None
 
@@ -289,6 +290,9 @@ class JackalBaseAPIView(_Getter, _PrePost, APIView):
 
     def simple_response(self, result=None, status=200, meta=None, headers=None, **kwargs):
         return self._response(result, status=status, meta=meta, headers=headers, **kwargs)
+
+    def binding_user(self):
+        return self.request.user
 
 
 class JackalAPIView(JackalBaseAPIView):

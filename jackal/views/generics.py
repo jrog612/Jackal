@@ -17,7 +17,10 @@ class ListCreateGeneric(JackalAPIView):
 
     def create(self, request, **kwargs):
         model = self.get_model()
-        obj = model.objects.create(**self.get_inspected_data(request))
+        obj = model(**self.get_inspected_data(request))
+        if self.bind_user_field:
+            setattr(obj, self.bind_user_field, self.binding_user())
+        obj.save()
         return self.simple_response({'id': obj.id})
 
 
