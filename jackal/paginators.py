@@ -20,12 +20,14 @@ class JackalPaginator:
 
     def serialized_data(self, serializer_class, context=None):
         ser = serializer_class(self.page_object(), many=True, context=context)
+        return ser.data
+
+    def meta_data(self):
         return {
             'current_page': self.page_number,
             'total_page': self.paginator.num_pages,
             'page_length': self.page_length,
             'count': self.paginator.count,
-            'data': ser.data
         }
 
     def page_object(self, page_number=None):

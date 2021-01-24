@@ -19,19 +19,19 @@ class _Getter:
             return self.get_queryset().model
 
     def get_lookup_map(self, **additional):
-        d = self.lookup_map
+        d = self.lookup_map or dict()
         return {**d, **additional}
 
     def get_filter_map(self, **additional):
-        d = self.filter_map
+        d = self.filter_map or dict()
         return {**d, **additional}
 
     def get_search_dict(self, **additional):
-        d = self.search_dict
+        d = self.search_dict or dict()
         return {**d, **additional}
 
     def get_extra_kwargs(self, **additional):
-        d = self.extra_kwargs
+        d = self.extra_kwargs or dict()
         return {**d, **additional}
 
     def get_query_filter_class(self):
@@ -260,28 +260,16 @@ class JackalBaseAPIView(_Getter, _PrePost, APIView):
     def get_response_data(self, request, **kwargs):
         pass
 
-    def get_paginated_data(self, request, queryset):
-        page_num = request.query_params.get(self.page_number_key, self.default_page_number)
-        page_length = request.query_params.get(self.page_length_key, self.default_page_length)
-
-        paginator_class = self.get_paginator_class()
-        paginator = paginator_class(queryset, page_num, page_length)
-
-        paginated_data = paginator.serialized_data(
-            serializer_class=self.get_serializer_class(),
-            context=self.get_serializer_context()
-        )
-        return paginated_data
-
     def has_auth(self):
         return self.request.user is not None and self.request.user.is_authenticated
 
     def _response(self, result=None, status=200, meta=None, headers=None, **kwargs):
         response_data = {}
+
         if self.result_root:
-            response_data[self.result_root] = result or dict()
+            response_data[self.result_root] = result
         else:
-            response_data = result or dict()
+            response_data = result
 
         if self.result_meta:
             response_data[self.result_meta] = meta or dict()

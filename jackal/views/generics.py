@@ -46,13 +46,30 @@ class DetailUpdateDestroyGeneric(JackalAPIView):
 
 
 class PaginateListGeneric(JackalAPIView):
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        self.paginator = None
+
+    def get_paginator(self, request, queryset):
+        page_num = request.query_params.get(self.page_number_key, self.default_page_number)
+        page_length = request.query_params.get(self.page_length_key, self.default_page_length)
+
+        paginator_class = self.get_paginator_class()
+        return paginator_class(queryset, page_num, page_length)
+
     def get_response_data(self, request, **kwargs):
         queryset = self.get_filtered_queryset(request, **kwargs)
-        return self.get_paginated_data(request, queryset)
+        self.paginator = self.get_paginator(request, queryset)
+        paginated_data = self.paginator.serialized_data(
+            serializer_class=self.get_serializer_class(),
+            context=self.get_serializer_context()
+        )
+        return paginated_data
 
     def paginated_list(self, request, **kwargs):
-        response_data = self.get_response_data(request, **kwargs)
-        return self.simple_response(response_data)
+        result = self.get_response_data(request, **kwargs)
+        meta_data = self.paginator.meta_data()
+        return self.simple_response(result, meta=meta_data)
 
 
 class SimpleGeneric(JackalAPIView):
