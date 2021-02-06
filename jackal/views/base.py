@@ -1,6 +1,7 @@
 from rest_framework.response import Response
 from rest_framework.views import APIView
 
+from jackal import exceptions
 from jackal.filters import JackalQueryFilter
 from jackal.helpers.data_helper import JackalDictMapper
 from jackal.inspectors import Inspector
@@ -10,13 +11,19 @@ from jackal.settings import jackal_settings
 
 class _Getter:
     def get_queryset(self):
-        return self.queryset
+        if self.queryset is not None:
+            self.queryset = self.queryset.all()
+            return self.queryset
+        elif self.model is not None:
+            return self.model.objects.all()
+        raise exceptions.JackalAPIException('JackalAPIView required model or queryset')
 
     def get_model(self):
         if self.model is not None:
             return self.model
-        else:
-            return self.get_queryset().model
+        elif self.queryset is not None:
+            return self.queryset.model
+        raise exceptions.JackalAPIException('JackalAPIView required model or queryset')
 
     def get_lookup_map(self, **additional):
         d = self.lookup_map or dict()
@@ -55,12 +62,12 @@ class _Getter:
     def get_jackal_exception_handler(self):
         return jackal_settings.EXCEPTION_HANDLER
 
-    def get_inspector(self, request):
+    def get_inspector(self):
         inspect_map = self.get_cur_inspect_map()
         if not inspect_map:
             return None
         ins_class = self.inspector_class
-        return ins_class(request.data, inspect_map)
+        return ins_class(self.request.data, inspect_map)
 
     def get_cur_inspect_map(self):
         return getattr(self, '{}_inspect_map'.format(self.request.method), self.inspect_map)
@@ -202,30 +209,36 @@ class JackalBaseAPIView(_Getter, _PrePost, APIView):
         super().check_object_permissions(request, obj)
         self.post_check_object_permissions(request, obj)
 
-    def get_object(self, request, **kwargs):
-        queryset = self.get_user_queryset(queryset=self.get_model().objects.all(), request=request)
+    def get_object(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        queryset = self.get_user_queryset(queryset=queryset)
 
         f_class = self.get_query_filter_class()
-        f = f_class(queryset=queryset, params=request.query_params)
+        f = f_class(queryset=queryset, params=self.request.query_params)
 
         lookup_map = self.get_lookup_map()
-        extra_kwargs = self.get_extra_kwargs(**JackalDictMapper.av2bv(lookup_map, kwargs))
+        extra_kwargs = self.get_extra_kwargs(
+            **JackalDictMapper.av2bv(lookup_map, self.kwargs)
+        )
 
         obj = f.extra(**extra_kwargs).get(raise_404=True)
-        self.check_object_permissions(request=request, obj=obj)
+        self.check_object_permissions(request=self.request, obj=obj)
         return obj
 
-    def get_filtered_queryset(self, request, **kwargs):
-        queryset = self.get_user_queryset(queryset=self.get_queryset(), request=request)
+    def get_filtered_queryset(self, queryset=None):
+        if queryset is None:
+            queryset = self.get_queryset()
+        queryset = self.get_user_queryset(queryset=queryset)
 
         f_class = self.get_query_filter_class()
-        f = f_class(queryset=queryset, params=request.query_params)
+        f = f_class(queryset=queryset, params=self.request.query_params)
 
         lookup_map = self.get_lookup_map()
         filter_map = self.get_filter_map()
         search_dict = self.get_search_dict()
         extra_kwargs = self.get_extra_kwargs()
-        extra_kwargs.update(JackalDictMapper.av2bv(lookup_map, kwargs))
+        extra_kwargs.update(JackalDictMapper.av2bv(lookup_map, self.kwargs))
 
         queryset = f.search(
             search_dict,
@@ -238,18 +251,18 @@ class JackalBaseAPIView(_Getter, _PrePost, APIView):
         ).queryset.distinct()
         return queryset
 
-    def get_user_queryset(self, request, queryset=None):
+    def get_user_queryset(self, queryset=None):
         if queryset is None:
             queryset = self.get_queryset()
 
         user_field = self.get_user_field()
         if user_field:
-            queryset = queryset.filter(**{user_field: request.user})
+            queryset = queryset.filter(**{user_field: self.request.user})
 
         return queryset
 
-    def get_inspected_data(self, request):
-        inspector = self.get_inspector(request)
+    def get_inspected_data(self):
+        inspector = self.get_inspector()
         if inspector is not None:
             return inspector.inspected_data
         return dict()
@@ -257,7 +270,7 @@ class JackalBaseAPIView(_Getter, _PrePost, APIView):
     def get_paginator_class(self):
         return self.paginator_class
 
-    def get_response_data(self, request, **kwargs):
+    def get_response_data(self):
         pass
 
     def has_auth(self):
@@ -268,11 +281,10 @@ class JackalBaseAPIView(_Getter, _PrePost, APIView):
 
         if self.result_root:
             response_data[self.result_root] = result
+            if self.result_meta:
+                response_data[self.result_meta] = meta or dict()
         else:
-            response_data = result
-
-        if self.result_meta:
-            response_data[self.result_meta] = meta or dict()
+            response_data = result or dict()
 
         return Response(response_data, status=status, headers=headers, **kwargs)
 

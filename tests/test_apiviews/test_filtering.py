@@ -17,10 +17,10 @@ class FilteringTestAPI(JackalAPIView):
     def get(self, request):
         kind = request.query_params['kind']
         if kind == 'queryset':
-            queryset = self.get_filtered_queryset(request)
+            queryset = self.get_filtered_queryset()
             ser = TestSerializer(queryset, many=True)
         else:
-            obj = self.get_object(request)
+            obj = self.get_object()
             ser = TestSerializer(obj)
         return self.simple_response(ser.data)
 

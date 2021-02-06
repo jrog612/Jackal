@@ -25,13 +25,6 @@ class GetterResponseTestAPIView(JackalAPIView):
     lookup_map = test_lookup_map
     inspect_map = test_inspect_map
 
-    def get(self, request):
-        case = request.query_params.get('case')
-        extra_info = request.query_params.get('extra_info')
-
-        if case == 'success':
-            return self.success(extra_info=extra_info)
-
     def post(self, request):
         append_dict = request.data.dict()
 
@@ -48,11 +41,11 @@ class GetterResponseTestAPIView(JackalAPIView):
         handler = self.get_jackal_exception_handler()
         assert handler is jackal_exception_handler
 
-        inspector = self.get_inspector(request)
+        inspector = self.get_inspector()
 
         assert isinstance(inspector, self.inspector_class)
 
-        return self.success()
+        return self.simple_response()
 
 
 class APIViewExtraTest(JackalAPITestCase):
