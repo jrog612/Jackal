@@ -109,7 +109,7 @@ class LabelValueListGeneric(JackalAPIView):
         return LabelValueSerializer
 
     def label_value_list(self, request, **kwargs):
-        queryset = self.get_filtered_queryset(**kwargs)
+        queryset = self.get_filtered_queryset()
         ser_class = self.get_serializer_class()
         serialized_data = ser_class(queryset, many=True)
         return self.simple_response(serialized_data.data)
