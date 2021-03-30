@@ -92,6 +92,9 @@ class SimpleGeneric(JackalAPIView):
     def delete_func(self, request, **kwargs):
         pass
 
+    def put_func(self, request, **kwargs):
+        pass
+
 
 class LabelValueListGeneric(JackalAPIView):
     label_field = 'name'

@@ -1,6 +1,6 @@
 [tool.poetry]
 name = "django-jackal"
-version = "3.0.2"
+version = "3.0.3"
 description = "extension of Django REST Framework"
 authors = ["joyongjin <wnrhd114@gmail.com>"]
 license = "MIT"
